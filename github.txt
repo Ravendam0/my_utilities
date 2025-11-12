@@ -9,7 +9,7 @@ git init
 git add .
 
 # Commit your changes
-git commit -m "Initial commit - Student & Admin Dashboard"
+git commit -m "My Utilities"
 
 # Add your GitHub repository URL
 git remote add origin https://github.com/Ravendam0/my_utilities.git
