@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator - Multiplayer Betting Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style id="app-style">
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #f43f5e;
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .game-container {
+            max-width: 1400px;
+        }
+        
+        .header-balance {
+            background: linear-gradient(90deg, rgba(79,70,229,0.2) 0%, rgba(16,185,129,0.2) 100%);
+            border: 1px solid var(--border-color);
+        }
+        
+        .multiplier-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        
+        .multiplier-crashed {
+            color: var(--danger-color);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        
+        .bet-chip {
+            transition: all 0.2s ease;
+        }
+        
+        .bet-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-canvas {
+            position: relative;
+            background: linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(15,23,42,0.8) 100%), 
+                        radial-gradient(circle, rgba(79,70,229,0.1) 0%, rgba(15,23,42,0) 70%);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            height: 400px;
+        }
+        
+        .plane {
+            position: absolute;
+            transform-origin: center;
+            transition: transform 0.05s linear;
+            z-index: 10;
+        }
+        
+        .plane-trail {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color) 0%, rgba(16, 185, 129, 0) 100%);
+            transform-origin: left;
+            z-index: 5;
+        }
+        
+        .cashout-btn {
+            background: var(--accent-color);
+            transition: all 0.2s ease;
+            transform-origin: center;
+        }
+        
+        .cashout-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        
+        .cashout-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .cashout-btn-disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+        
+        .history-item {
+            transition: all 0.2s ease;
+        }
+        
+        .history-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .low-multiplier {
+            color: var(--danger-color);
+        }
+        
+        .medium-multiplier {
+            color: #fbbf24;
+        }
+        
+        .high-multiplier {
+            color: var(--accent-color);
+        }
+        
+        .countdown-timer {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            animation-duration: 0.5s;
+        }
+        
+        .leaderboard-avatar {
+            border: 2px solid var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .multiplier-display {
+                font-size: 2rem;
+            }
+            
+            .game-canvas {
+                height: 300px;
+            }
+            
+            .bet-controls {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animation for crash effect */
+        @keyframes crash {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+        
+        .crash-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.8) 0%, rgba(239, 68, 68, 0) 70%);
+            opacity: 0;
+            z-index: 20;
+            pointer-events: none;
+        }
+        
+        .crash-active {
+            animation: crash 1s ease-out forwards;
+        }
+        
+        /* Pulsing effect for waiting */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        /* Graph line animation */
+        .graph-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+        
+        .graph-animate {
+            animation: draw 30s linear forwards;
+        }
+        
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        /* Tab styles */
+        .tab-active {
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <!-- Main container -->
+    <div class="container mx-auto px-4 py-4 game-container">
+        <!-- Header with user balance and controls -->
+        <header class="flex flex-col md:flex-row items-center justify-between mb-6">
+            <div class="flex items-center mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold orbitron text-indigo-500">
+                    <i class="fas fa-plane-departure mr-2"></i>AVIATOR
+                </h1>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div class="header-balance rounded-full px-6 py-2 flex items-center">
+                    <span class="text-gray-300 mr-2">Balance:</span>
+                    <span class="text-white font-bold" id="user-balance">10,000.00</span>
+                    <span class="text-gray-300 ml-1" id="currency">USD</span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-4 py-2 flex items-center">
+                        <i class="fas fa-wallet mr-1"></i> Deposit
+                    </button>
+                    <button class="bg-gray-700 hover:bg-gray-600 text-white rounded-full px-4 py-2 flex items-center">
+                        <i class="fas fa-money-bill-transfer mr-1"></i> Withdraw
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Main game section (3/4 width on desktop) -->
+            <div class="lg:col-span-3">
+                <!-- Game status card -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4" id="round-info">
+                        <!-- Changes between countdown and in-flight states -->
+                        <div id="round-status" class="mb-4 md:mb-0">
+                            <div id="betting-phase" class="flex flex-col items-center md:items-start">
+                                <div class="text-gray-300 mb-1">NEXT ROUND IN</div>
+                                <div class="countdown-timer text-2xl font-bold text-white" id="countdown-timer">00:15</div>
+                            </div>
+                            <div id="flying-phase" class="hidden flex flex-col items-center md:items-start">
+                                <div class="text-gray-300 mb-1">CURRENT ROUND</div>
+                                <div class="text-xl font-bold text-green-500">FLYING</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col items-center md:items-end">
+                            <div class="text-gray-300 mb-1">PLAYERS BETTING</div>
+                            <div class="flex items-center">
+                                <span class="text-xl font-bold text-white mr-2" id="players-count">24</span>
+                                <i class="fas fa-users text-indigo-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Betting controls -->
+                    <div id="betting-controls" class="bg-gray-900 rounded-lg p-4">
+                        <h3 class="text-lg font-bold mb-3">Place Your Bet</h3>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button class="bet-chip bg-gray-700 hover:bg-indigo-600 text-white rounded-full px-4 py-1">$10</button>
+                            <button class="bet-chip bg-gray-700 hover:bg-indigo-600 text-white rounded-full px-4 py-1">$50</button>
+                            <button class="bet-chip bg-gray-700 hover:bg-indigo-600 text-white rounded-full px-4 py-1">$100</button>
+                            <button class="bet-chip bg-gray-700 hover:bg-indigo-600 text-white rounded-full px-4 py-1">$500</button>
+                            <button class="bet-chip bg-gray-700 hover:bg-indigo-600 text-white rounded-full px-4 py-1">$1000</button>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mb-4">
+                            <div class="flex-grow">
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                                    <input type="text" id="bet-amount" class="w-full bg-gray-800 text-white px-8 py-3 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter amount">
+                                </div>
+                            </div>
+                            <button id="place-bet-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold transition">
+                                PLACE BET
+                            </button>
+                        </div>
+                        
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>Min bet: $1.00</span>
+                            <span>Max bet: $10,000.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game visualization area -->
+                <div class="bg-gray-800 rounded-lg p-4 mb-6 relative">
+                    <!-- Current multiplier display -->
+                    <div class="absolute top-6 left-0 right-0 flex justify-center z-30">
+                        <div class="multiplier-display text-center py-2 px-6 rounded-full bg-gray-900 bg-opacity-80 border border-gray-700">
+                            <span id="current-multiplier">1.00</span><span>×</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Cash out button -->
+                    <div class="absolute bottom-6 right-6 z-30">
+                        <button id="cashout-btn" class="cashout-btn hidden cashout-btn-disabled px-6 py-3 rounded-lg text-white font-bold text-lg">
+                            <span>CASH OUT</span>
+                            <div class="text-sm">
+                                <span id="cashout-amount">$0.00</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <!-- Game canvas for animations -->
+                    <div id="game-canvas" class="game-canvas relative w-full">
+                        <div class="w-full h-full flex items-center justify-center" id="waiting-message">
+                            <div class="text-center pulse">
+                                <i class="fas fa-plane text-4xl mb-3 text-indigo-500"></i>
+                                <p class="text-xl text-gray-300">Waiting for next flight...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Plane animation elements -->
+                        <img id="plane" src="https://cdn.pixabay.com/photo/2014/04/03/00/41/airplane-309192_960_720.png" class="plane hidden h-12 w-12" alt="Airplane">
+                        <div id="plane-trail" class="plane-trail hidden"></div>
+                        
+                        <!-- Crash effect overlay -->
+                        <div id="crash-effect" class="crash-effect"></div>
+                    </div>
+                </div>
+                
+                <!-- Round history -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">Recent Rounds</h3>
+                    
+                    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-6">
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28394</div>
+                            <div class="text-lg font-bold low-multiplier">1.24×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28393</div>
+                            <div class="text-lg font-bold medium-multiplier">2.85×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28392</div>
+                            <div class="text-lg font-bold high-multiplier">5.23×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28391</div>
+                            <div class="text-lg font-bold high-multiplier">10.67×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28390</div>
+                            <div class="text-lg font-bold low-multiplier">1.04×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28389</div>
+                            <div class="text-lg font-bold medium-multiplier">3.45×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28388</div>
+                            <div class="text-lg font-bold high-multiplier">8.92×</div>
+                        </div>
+                        <div class="history-item bg-gray-900 rounded p-2 text-center">
+                            <div class="text-sm text-gray-400">#28387</div>
+                            <div class="text-lg font-bold medium-multiplier">2.33×</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="text-gray-400">
+                            <span class="text-sm">Provably fair system:</span>
+                            <a href="javascript:void(0)" class="text-indigo-400 hover:text-indigo-300 text-sm ml-1">Learn more</a>
+                        </div>
+                        <button class="text-indigo-400 hover:text-indigo-300 text-sm">
+                            View all history <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar (1/4 width on desktop) -->
+            <div class="lg:col-span-1">
+                <!-- Tabs for mobile -->
+                <div class="lg:hidden flex mb-4 border-b border-gray-700">
+                    <button class="tab-active flex-1 py-3 text-center">Leaderboard</button>
+                    <button class="text-gray-400 flex-1 py-3 text-center">My Bets</button>
+                </div>
+                
+                <!-- Leaderboard -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4">Today's Top Winners</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center leaderboard-avatar">
+                                <span class="text-white font-bold">1</span>
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <div class="font-semibold">CryptoKing</div>
+                                <div class="text-sm text-gray-400">$25,843 won</div>
+                            </div>
+                            <div class="text-green-500 font-bold">32.4×</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center leaderboard-avatar">
+                                <span class="text-white font-bold">2</span>
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <div class="font-semibold">LuckyPilot</div>
+                                <div class="text-sm text-gray-400">$12,540 won</div>
+                            </div>
+                            <div class="text-green-500 font-bold">18.7×</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center leaderboard-avatar">
+                                <span class="text-white font-bold">3</span>
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <div class="font-semibold">SkyRider</div>
+                                <div class="text-sm text-gray-400">$8,932 won</div>
+                            </div>
+                            <div class="text-green-500 font-bold">15.2×</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center leaderboard-avatar">
+                                <span class="text-white font-bold">4</span>
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <div class="font-semibold">BetMaster</div>
+                                <div class="text-sm text-gray-400">$6,421 won</div>
+                            </div>
+                            <div class="text-green-500 font-bold">12.8×</div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center leaderboard-avatar">
+                                <span class="text-white font-bold">5</span>
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <div class="font-semibold">AviatorPro</div>
+                                <div class="text-sm text-gray-400">$4,775 won</div>
+                            </div>
+                            <div class="text-green-500 font-bold">9.5×</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My recent bets -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">My Recent Bets</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-gray-900 rounded-lg p-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Bet:</span>
+                                <span class="font-bold">$100.00</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Multiplier:</span>
+                                <span class="font-bold text-green-500">2.35×</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Profit:</span>
+                                <span class="font-bold text-green-500">+$135.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-900 rounded-lg p-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Bet:</span>
+                                <span class="font-bold">$250.00</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Multiplier:</span>
+                                <span class="font-bold text-red-500">1.00×</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Profit:</span>
+                                <span class="font-bold text-red-500">-$250.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-900 rounded-lg p-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Bet:</span>
+                                <span class="font-bold">$50.00</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Multiplier:</span>
+                                <span class="font-bold text-green-500">3.42×</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Profit:</span>
+                                <span class="font-bold text-green-500">+$121.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg py-2">
+                        View All Bets
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-400 text-sm py-4 border-t border-gray-800">
+            <div class="mb-2">
+                <a href="javascript:void(0)" class="hover:text-white mr-4">About</a>
+                <a href="javascript:void(0)" class="hover:text-white mr-4">Terms</a>
+                <a href="javascript:void(0)" class="hover:text-white mr-4">Privacy</a>
+                <a href="javascript:void(0)" class="hover:text-white mr-4">Support</a>
+                <a href="javascript:void(0)" class="hover:text-white">Fair Play</a>
+            </div>
+            <p>© 2025 Aviator Betting Game. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <!-- Notification area -->
+    <div id="notification-area"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script id="app-script">
+        // Game state variables
+        const gameState = {
+            phase: 'betting', // 'betting', 'flying', 'crashed'
+            countdownTime: 15,
+            currentMultiplier: 1.00,
+            betAmount: 0,
+            hasBet: false,
+            hashedOut: false,
+            planePosition: { x: 50, y: 350 },
+            gameSpeed: 0.5, // Controls how quickly the multiplier increases
+            crashPoint: 0, // Will be set when round starts
+            animationFrameId: null
+        };
+
+        // DOM elements
+        const $countdownTimer = $('#countdown-timer');
+        const $bettingPhase = $('#betting-phase');
+        const $flyingPhase = $('#flying-phase');
+        const $bettingControls = $('#betting-controls');
+        const $currentMultiplier = $('#current-multiplier');
+        const $cashoutBtn = $('#cashout-btn');
+        const $cashoutAmount = $('#cashout-amount');
+        const $waitingMessage = $('#waiting-message');
+        const $plane = $('#plane');
+        const $planeTrail = $('#plane-trail');
+        const $crashEffect = $('#crash-effect');
+        const $gameCanvas = $('#game-canvas');
+        const $betAmount = $('#bet-amount');
+        const $placeBetBtn = $('#place-bet-btn');
+
+        // Initialize game
+        $(document).ready(() => {
+            initGame();
+            startCountdown();
+        });
+
+        // Initialize game
+        function initGame() {
+            // Set up event listeners
+            $placeBetBtn.on('click', handlePlaceBet);
+            $cashoutBtn.on('click', handleCashOut);
+            
+            // Set initial positions
+            positionPlane(gameState.planePosition.x, gameState.planePosition.y);
+            
+            // Set up bet amount input
+            $betAmount.on('input', function() {
+                let value = $(this).val().replace(/[^0-9.]/g, '');
+                if (value) {
+                    $(this).val(value);
+                }
+            });
+            
+            // Chip buttons
+            $('.bet-chip').on('click', function() {
+                const amount = $(this).text().replace('$', '');
+                $betAmount.val(amount);
+            });
+        }
+
+        // Start countdown for next round
+        function startCountdown() {
+            gameState.phase = 'betting';
+            gameState.countdownTime = 15;
+            gameState.hasBet = false;
+            gameState.hashedOut = false;
+            gameState.currentMultiplier = 1.00;
+            
+            $bettingPhase.show();
+            $flyingPhase.hide();
+            $bettingControls.show();
+            $waitingMessage.show();
+            $plane.hide();
+            $planeTrail.hide();
+            $cashoutBtn.hide().addClass('cashout-btn-disabled');
+            $currentMultiplier.text('1.00').removeClass('multiplier-crashed');
+            $crashEffect.removeClass('crash-active');
+            
+            updateCountdown();
+            
+            const countdownInterval = setInterval(() => {
+                gameState.countdownTime -= 1;
+                
+                if (gameState.countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    startFlight();
+                } else {
+                    updateCountdown();
+                }
+            }, 1000);
+        }
+
+        // Update countdown display
+        function updateCountdown() {
+            const seconds = String(gameState.countdownTime).padStart(2, '0');
+            $countdownTimer.text(`00:${seconds}`);
+        }
+
+        // Start the flight (multiplier begins)
+        function startFlight() {
+            gameState.phase = 'flying';
+            gameState.currentMultiplier = 1.00;
+            
+            // Determine crash point (simulated for prototype)
+            // In a real implementation, this would come from server using provably fair system
+            gameState.crashPoint = getRandomCrashPoint();
+            
+            // Update UI
+            $bettingPhase.hide();
+            $flyingPhase.show();
+            $bettingControls.hide();
+            $waitingMessage.hide();
+            
+            // Show plane and trail
+            $plane.show();
+            $planeTrail.show();
+            
+            // Position plane at starting point
+            gameState.planePosition = { x: 50, y: 350 };
+            positionPlane(gameState.planePosition.x, gameState.planePosition.y);
+            
+            // Enable cashout if player has bet
+            if (gameState.hasBet) {
+                $cashoutBtn.removeClass('cashout-btn-disabled').show();
+                updateCashoutAmount();
+            }
+            
+            // Start animation loop
+            cancelAnimationFrame(gameState.animationFrameId);
+            gameState.animationFrameId = requestAnimationFrame(updateFlight);
+        }
+
+        // Update flight animation frame
+        function updateFlight(timestamp) {
+            // Update multiplier (increases exponentially over time)
+            const multiplierIncrease = 0.01 * gameState.gameSpeed;
+            gameState.currentMultiplier += (gameState.currentMultiplier * multiplierIncrease);
+            
+            // Round to 2 decimal places for display
+            const displayMultiplier = Math.floor(gameState.currentMultiplier * 100) / 100;
+            $currentMultiplier.text(displayMultiplier.toFixed(2));
+            
+            // Update cashout amount if player has bet
+            if (gameState.hasBet && !gameState.hashedOut) {
+                updateCashoutAmount();
+            }
+            
+            // Update plane position (moves up and right, following a curve)
+            updatePlanePosition();
+            
+            // Check if crash point reached
+            if (gameState.currentMultiplier >= gameState.crashPoint) {
+                crash();
+                return;
+            }
+            
+            // Continue animation
+            gameState.animationFrameId = requestAnimationFrame(updateFlight);
+        }
+
+        // Update plane position based on multiplier
+        function updatePlanePosition() {
+            // Calculate new position based on multiplier
+            // This creates a curve that flattens as multiplier increases
+            const maxHeight = $gameCanvas.height() - 50;
+            const maxWidth = $gameCanvas.width() - 100;
+            
+            // Logarithmic curve for height (plane rises quickly at first, then more slowly)
+            const heightFactor = Math.log(gameState.currentMultiplier) / Math.log(10);
+            const newY = Math.max(50, maxHeight - (heightFactor * 100));
+            
+            // Linear increase for x position
+            const newX = Math.min(maxWidth, 50 + (gameState.currentMultiplier * 20));
+            
+            gameState.planePosition = { x: newX, y: newY };
+            positionPlane(newX, newY);
+            
+            // Update trail
+            updatePlaneTrail(newX, newY);
+        }
+
+        // Position plane element
+        function positionPlane(x, y) {
+            $plane.css({
+                left: `${x}px`,
+                top: `${y}px`,
+                transform: `rotate(${Math.min(30, (gameState.currentMultiplier - 1) * 10)}deg)`
+            });
+        }
+
+        // Update plane trail
+        function updatePlaneTrail(x, y) {
+            // Calculate trail width based on distance from start
+            const trailWidth = x - 50;
+            
+            // Position trail to follow plane
+            $planeTrail.css({
+                left: '50px',
+                top: `${y + 6}px`,
+                width: `${trailWidth}px`,
+                transform: `rotate(${Math.atan2(350 - y, trailWidth) * (180/Math.PI)}deg)`
+            });
+        }
+
+        // Handle crash event
+        function crash() {
+            cancelAnimationFrame(gameState.animationFrameId);
+            gameState.phase = 'crashed';
+            
+            // Trigger crash animation
+            $crashEffect.addClass('crash-active');
+            $currentMultiplier.addClass('multiplier-crashed');
+            
+            // Disable cashout
+            $cashoutBtn.addClass('cashout-btn-disabled').hide();
+            
+            // If player had bet and didn't cash out, show notification
+            if (gameState.hasBet && !gameState.hashedOut) {
+                showNotification(`You lost $${gameState.betAmount.toFixed(2)}!`, 'error');
+            }
+            
+            // Wait a bit, then start next round
+            setTimeout(() => {
+                startCountdown();
+            }, 3000);
+        }
+
+        // Handle bet placement
+        function handlePlaceBet() {
+            if (gameState.phase !== 'betting') return;
+            
+            const amount = parseFloat($betAmount.val());
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid bet amount', 'error');
+                return;
+            }
+            
+            // In a real app, this would call an API to place the bet
+            gameState.betAmount = amount;
+            gameState.hasBet = true;
+            
+            showNotification(`Bet placed: $${amount.toFixed(2)}`, 'success');
+            
+            // Update UI
+            $placeBetBtn.text('BET PLACED').prop('disabled', true).addClass('bg-green-700').removeClass('bg-indigo-600 hover:bg-indigo-700');
+            $betAmount.prop('disabled', true);
+            $('.bet-chip').prop('disabled', true).addClass('opacity-50');
+        }
+
+        // Handle cash out action
+        function handleCashOut() {
+            if (gameState.phase !== 'flying' || !gameState.hasBet || gameState.hashedOut) return;
+            
+            // Calculate winnings
+            const winAmount = gameState.betAmount * gameState.currentMultiplier;
+            
+            // In a real app, this would call an API to cash out
+            gameState.hashedOut = true;
+            
+            // Update UI
+            $cashoutBtn.addClass('cashout-btn-disabled').hide();
+            
+            // Show notification
+            showNotification(`Cashed out: $${winAmount.toFixed(2)}!`, 'success');
+        }
+
+        // Update cashout amount display
+        function updateCashoutAmount() {
+            const amount = gameState.betAmount * gameState.currentMultiplier;
+            $cashoutAmount.text(`$${amount.toFixed(2)}`);
+        }
+
+        // Generate random crash point (simulated for prototype)
+        function getRandomCrashPoint() {
+            // In a real implementation, this would use provably fair algorithm on server
+            // For prototype, generate values with distribution similar to real games
+            // Most crashes happen under 2x, sometimes medium (2-5x), rarely high (>5x)
+            const r = Math.random();
+            if (r < 0.33) return 1 + (Math.random() * 0.5); // 33% chance of 1.0-1.5x
+            if (r < 0.7) return 1.5 + (Math.random() * 1.5); // 37% chance of 1.5-3.0x
+            if (r < 0.9) return 3.0 + (Math.random() * 4); // 20% chance of 3.0-7.0x
+            return 7.0 + (Math.random() * 8); // 10% chance of 7.0-15.0x
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notificationId = 'notification-' + Date.now();
+            let bgColor = 'bg-blue-500';
+            let icon = 'fa-info-circle';
+            
+            if (type === 'success') {
+                bgColor = 'bg-green-500';
+                icon = 'fa-check-circle';
+            } else if (type === 'error') {
+                bgColor = 'bg-red-500';
+                icon = 'fa-exclamation-circle';
+            }
+            
+            const notification = `
+                <div id="${notificationId}" class="notification ${bgColor} text-white px-4 py-3 rounded shadow-lg mb-3 animate__animated animate__fadeInRight">
+                    <div class="flex items-center">
+                        <i class="fas ${icon} mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Add to notification area
+            $('#notification-area').append(notification);
+            
+            // Remove after delay
+            setTimeout(() => {
+                $(`#${notificationId}`).removeClass('animate__fadeInRight').addClass('animate__fadeOutRight');
+                setTimeout(() => {
+                    $(`#${notificationId}`).remove();
+                }, 500);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* https://github.com/Ravendam0/my_utilities.git */
+
+
+
+/* # Initialize git in your folder
+git init
+
+# Add all files
+git add .
+
+# Commit your changes
+git commit -m "Initial commit - Student & Admin Dashboard"
+
+# Add your GitHub repository URL
+git remote add origin https://github.com/Ravendam0/my_utilities.git
+
+# Push your files to GitHub
+git branch -M main
+git push -u origin main
+
+if i want to update the files later, you can use the following commands:
+
+git add .
+git commit -m "Updated frontend files"
+git push */

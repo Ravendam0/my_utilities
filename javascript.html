@@ -1,0 +1,41 @@
+<html>
+<!-- <script>
+
+    let age = prompt("how old are you?")
+
+
+</script> -->
+<a href="javascript:void">Click here to do nothing</a>
+<script>
+    document.write(Date())
+    const toDay = new Date();
+    const day = toDay.getDate();
+
+    console.log(day); // Today;s Date
+</script>
+<script>
+    const month = new Date();
+    const todayMonth = month.getMonth();
+
+    console.log(todayMonth); // Today;s Month
+</script>
+
+<p id="todaysDate"></p>
+
+<script>
+    function displayCurrentDate() {
+        const now = new Date();
+        document.getElementById("todaysDate").textContent = now.toString();
+    }
+
+    // Call the function when the page loads
+    window.onload = displayCurrentDate;
+</script>
+
+
+</html>
+
+// <!-- Miles-to-kilometers converter
+//  Create a variable that contains a value in miles, convert it to kilometers, and log the 
+// value in kilometers in the following format: 
+// The distance of 130 kms is equal to 209.2142 miles -->

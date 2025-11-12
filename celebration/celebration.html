@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1M+ Followers — Thank You!</title>
+<style>
+  :root{ --bg1:#0b1020; --bg2:#111a3a; --accent:#ffd166; --text:#eaf2ff; --muted:#9fb0d2; }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; overflow:hidden; color:var(--text);
+    font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    background: radial-gradient(1100px 760px at 70% 18%, #1c2656 0%, var(--bg2) 45%, var(--bg1) 100%) fixed;
+  }
+  .stars,.stars:before,.stars:after{
+    position:fixed; inset:0; content:""; pointer-events:none; opacity:.25;
+    background-image:
+      radial-gradient(1px 1px at 20% 10%, #ffffffaa 99%, transparent 100%),
+      radial-gradient(1px 1px at 80% 30%, #ffffff80 99%, transparent 100%),
+      radial-gradient(1px 1px at 60% 70%, #ffffff66 99%, transparent 100%),
+      radial-gradient(1px 1px at 30% 50%, #ffffff88 99%, transparent 100%),
+      radial-gradient(1px 1px at 90% 80%, #ffffff55 99%, transparent 100%);
+  }
+  .stars:before{ transform:translateY(-10px); filter:blur(.3px) }
+  .stars:after { transform:translateY( 10px); filter:blur(.6px) }
+
+  .hero{ position:fixed; inset:0; display:grid; place-items:center; text-align:center; padding:16px; pointer-events:none; }
+  .card{
+    pointer-events:auto;
+    background: linear-gradient(180deg,#121a36aa,#0d122b88);
+    border:1px solid #2a3568; border-radius:16px;
+    padding:clamp(10px,2vw,16px) clamp(14px,3vw,22px);
+    max-width:560px;
+    box-shadow:0 8px 32px #0008, inset 0 0 30px #5b6bff14;
+    backdrop-filter: blur(8px) saturate(120%);
+    animation: floaty 6s ease-in-out infinite alternate;
+  }
+  @keyframes floaty{from{transform:translateY(0)} to{transform:translateY(-4px)}}
+  h1{
+    margin:0 0 6px; font-weight:800; letter-spacing:.4px;
+    font-size:clamp(26px,5vw,52px); line-height:1.06;
+    text-shadow:0 0 24px #7aa2ff60, 0 0 64px #7aa2ff30;
+  }
+  .big{
+    display:inline-block;
+    background:conic-gradient(from 180deg,#ff6b6b,#ffd166,#6bff8b,#76d6ff,#a97aff,#ff6b6b);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 12px #ffffff18);
+  }
+  .sub{ margin:6px 0 10px; font-size:clamp(13px,2vw,18px); color:var(--muted) }
+  .cta{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 14px;
+    font-weight:800; letter-spacing:.3px; text-decoration:none; color:#0b1020;
+    background:var(--accent); border-radius:999px;
+    box-shadow:0 6px 20px #ffd16655, inset 0 1px 0 #fff6; transition:transform .15s ease;
+  }
+  .cta:hover{ transform:translateY(-1px) scale(1.02) }
+
+  /* Canvas (particles, rockets, balloons + cursor sparks) */
+  canvas#scene{ position:fixed; inset:0; width:100%; height:100%; display:block; cursor:none; }
+
+  /* Custom animated cursor (no ribbon) */
+  .cursor{
+    position:fixed; left:0; top:0; width:28px; height:28px; pointer-events:none; z-index:6;
+    transform:translate(-50%,-50%); filter:drop-shadow(0 0 8px #8bf);
+  }
+  .cursor .ring{
+    position:absolute; inset:0; border-radius:50%;
+    background: conic-gradient(from 0deg, #7cf, #f7c, #ffd166, #7cf);
+    -webkit-mask: radial-gradient(circle, transparent 45%, black 46%);
+            mask: radial-gradient(circle, transparent 45%, black 46%);
+    animation: spin 1.2s linear infinite;
+  }
+  .cursor .dot{
+    position:absolute; left:50%; top:50%; width:7px; height:7px; border-radius:50%;
+    transform:translate(-50%,-50%); background:#fff; box-shadow:0 0 10px #fff8, 0 0 20px #7cf8;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+  @keyframes pulse{ 0%,100%{ transform:translate(-50%,-50%) scale(1) } 50%{ transform:translate(-50%,-50%) scale(1.35) } }
+
+  .hint{ position:fixed; bottom:10px; left:50%; transform:translateX(-50%); font-size:12px; opacity:.7; user-select:none }
+  @media (prefers-reduced-motion: reduce){ .card,.cursor .ring,.cursor .dot{ animation:none } }
+</style>
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="stars" aria-hidden="true"></div>
+
+  <!-- Fancy cursor (no ribbon) -->
+  <div class="cursor" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="dot"></div>
+  </div>
+
+  <main class="hero" role="main">
+    <section class="card">
+      <h1><span class="big">1M+ Followers</span> on Instagram 🎉</h1>
+      <p class="sub">Thank you for being part of the journey. ❤️</p>
+      <a class="cta" href="https://www.instagram.com/the_coding_wizard" target="_blank" rel="noopener">@the_coding_wizard</a>
+    </section>
+  </main>
+
+  <div class="hint">Click to launch (M to mute). Pop the balloons!</div>
+
+<script>
+(() => {
+  /* ---------- Setup ---------- */
+  var scene = document.getElementById('scene');
+  var sctx = scene.getContext('2d', { alpha: true });
+  var DPR = 1, W = 0, H = 0;
+  var prefersReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    scene.width  = Math.max(1, Math.floor(window.innerWidth  * DPR));
+    scene.height = Math.max(1, Math.floor(window.innerHeight * DPR));
+    scene.style.width  = window.innerWidth  + 'px';
+    scene.style.height = window.innerHeight + 'px';
+    sctx.setTransform(1,0,0,1,0,0); sctx.scale(DPR, DPR);
+    W = window.innerWidth; H = window.innerHeight;
+  }
+  window.addEventListener('resize', resize, { passive: true }); resize();
+
+  /* ---------- Custom cursor + brighter, longer cursor sparks ---------- */
+  var cursorEl = document.querySelector('.cursor');
+  var pointer = { x: W/2, y: H/2, vx:0, vy:0, lastEmit:0 };
+
+  window.addEventListener('pointermove', function(e){
+    var nx = Math.max(0, Math.min(W, e.clientX));
+    var ny = Math.max(0, Math.min(H, e.clientY));
+    var pvx = nx - pointer.x, pvy = ny - pointer.y;
+    pointer.vx = pvx; pointer.vy = pvy; pointer.x = nx; pointer.y = ny;
+
+    // Brighter, longer sparklets that still vanish quickly (no canvas smear).
+    var speed = Math.hypot ? Math.hypot(pvx, pvy) : Math.sqrt(pvx*pvx + pvy*pvy);
+    var now = performance.now();
+    if (speed > 5 && now - pointer.lastEmit > 16) {
+      var count = Math.min(6, 2 + Math.floor(speed / 10)); // up to 6
+      var hueBase = (Math.atan2(pvy, pvx) * 180/Math.PI + 360) % 360;
+      for (var i=0;i<count;i++){
+        addParticle({
+          x: nx + (Math.random()*5-2.5),
+          y: ny + (Math.random()*5-2.5),
+          vx: (Math.random()*1.2-0.6) + pvx*0.045,
+          vy: (Math.random()*1.2-0.6) + pvy*0.045,
+          life: 350 + Math.random()*200,      // ~0.35–0.55s
+          age: 0,
+          size: 1.6 + Math.random()*2.2,      // larger
+          hue: (hueBase + Math.random()*36 - 18 + 360) % 360,
+          type: 'cursor',
+          alpha: 1,
+          drag: 0.9,
+          grav: 0.02,
+          flicker: Math.random()<0.35
+        });
+      }
+      pointer.lastEmit = now;
+    }
+  }, { passive:true });
+
+  /* ---------- Audio: rocket whistle + pop ---------- */
+  var audioCtx = null, muted = false;
+  function ensureAudio(){
+    try{
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }catch(e){}
+  }
+  function playRocketWhistle(duration){
+    if (muted || prefersReduced || !audioCtx) return { stop:function(){} };
+    duration = duration || 1.1;
+    try{
+      var ctx = audioCtx, t0 = ctx.currentTime;
+
+      var osc = ctx.createOscillator(); osc.type='sine';
+      var vibrato = ctx.createOscillator(); vibrato.type='sine'; vibrato.frequency.value = 8;
+      var vibGain = ctx.createGain(); vibGain.gain.value = 35;
+      vibrato.connect(vibGain); vibGain.connect(osc.frequency);
+
+      osc.frequency.setValueAtTime(500, t0);
+      osc.frequency.exponentialRampToValueAtTime(1800, t0+duration);
+
+      var bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.setValueAtTime(1400, t0); bp.Q.value = 12;
+      var og = ctx.createGain(); og.gain.setValueAtTime(0.0001, t0); og.gain.exponentialRampToValueAtTime(0.25, t0 + 0.03);
+      og.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+      var nb = ctx.createBuffer(1, Math.max(1, ctx.sampleRate*duration|0), ctx.sampleRate);
+      var d = nb.getChannelData(0);
+      for (var i=0;i<d.length;i++){ d[i] = (Math.random()*2-1) * (1 - i/d.length) * 0.4; }
+      var ns = ctx.createBufferSource(); ns.buffer = nb;
+      var hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value = 900;
+      var ng = ctx.createGain(); ng.gain.setValueAtTime(0.0001, t0); ng.gain.exponentialRampToValueAtTime(0.18, t0 + 0.03);
+      ng.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+      osc.connect(bp); bp.connect(og); og.connect(ctx.destination);
+      ns.connect(hp); hp.connect(ng); ng.connect(ctx.destination);
+
+      osc.start(t0); vibrato.start(t0); ns.start(t0);
+      osc.stop(t0 + duration); vibrato.stop(t0 + duration); ns.stop(t0 + duration);
+
+      return { stop:function(){ try{ osc.stop(); vibrato.stop(); ns.stop(); }catch(e){} } };
+    }catch(e){ return { stop:function(){} }; }
+  }
+  function playPop(){
+    if (muted || prefersReduced || !audioCtx) return;
+    try{
+      var t0 = audioCtx.currentTime;
+      var o = audioCtx.createOscillator(); o.type='sine';
+      var og = audioCtx.createGain();
+      o.frequency.setValueAtTime(1200, t0);
+      o.frequency.exponentialRampToValueAtTime(220, t0+0.07);
+      og.gain.setValueAtTime(0.22, t0);
+      og.gain.exponentialRampToValueAtTime(0.0001, t0+0.1);
+      o.connect(og); og.connect(audioCtx.destination);
+      o.start(t0); o.stop(t0+0.11);
+    }catch(e){}
+  }
+  window.addEventListener('keydown', function(e){ if((e.key||'').toLowerCase()==='m') muted = !muted; });
+
+  /* ---------- Particles / Rockets / Balloons ---------- */
+  var TAU = Math.PI*2;
+  function rnd(a,b){ return Math.random()*(b-a)+a; }
+
+  var particles = [];
+  var rockets = [];
+  var balloons = [];
+  var MAX_PARTICLES = 1500; // slight bump to handle added cursor sparks
+
+  function addParticle(p){ if(particles.length<MAX_PARTICLES) particles.push(p); }
+  function burst(x,y,power){
+    power = power || 1.2;
+    var baseHue = Math.floor(rnd(0,360));
+    var count = Math.floor(60*power);
+    for (var i=0;i<count;i++){
+      var ang = rnd(0,TAU), spd = rnd(2.5,6.2)*power;
+      addParticle({
+        x:x,y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
+        life:rnd(0.9,1.5)*1000, age:0, size:rnd(1.6,3.3)*power,
+        hue:(baseHue + rnd(-20,20) + 360)%360, type:'spark',
+        alpha:1, drag:rnd(0.96,0.985), grav:rnd(0.02,0.06), flicker:Math.random()<0.25
+      });
+    }
+    addParticle({x:x,y:y,vx:0,vy:0,life:200,age:0,size:46*power,hue:baseHue,alpha:.38,type:'flash',grav:0,drag:1,flicker:false});
+    playPop();
+  }
+
+  function rocket(fromX){
+    var targetY = H * rnd(0.10, 0.22);
+    var vx = rnd(-0.6,0.6);
+    var vy0 = -rnd(6.6,8.6);
+    var whistle = audioCtx ? playRocketWhistle(rnd(1.0,1.15)) : { stop:function(){} };
+    rockets.push({ x:fromX, y:H-6, vx:vx, vy:vy0, targetY:targetY, whistle:whistle, alive:true });
+  }
+
+  function makeBalloon(){
+    var colors = [
+      {h:  0, s:95, l:60}, {h:210, s:95, l:65}, {h:140, s:95, l:55},
+      {h:280, s:95, l:70}, {h: 35, s:100, l:60}
+    ];
+    var c = colors[Math.floor(Math.random()*colors.length)];
+    return {
+      x: rnd(40, W-40), y: H + rnd(20, 200),
+      vy: rnd(-0.7, -1.2),
+      swayA: rnd(0.002, 0.004),
+      swayT: rnd(0, 1000),
+      r: rnd(18, 28),
+      color: c, alive: true
+    };
+  }
+  for (var bi=0; bi<12; bi++) balloons.push(makeBalloon());
+
+  function drawBalloon(b){
+    sctx.save(); sctx.translate(b.x, b.y);
+    var fill = 'hsl(' + b.color.h + ' ' + b.color.s + '% ' + b.color.l + '%)';
+    sctx.fillStyle = fill; sctx.strokeStyle = 'rgba(0,0,0,.25)'; sctx.lineWidth = 1;
+    sctx.beginPath(); sctx.ellipse(0,0,b.r*0.9,b.r*1.1,0,0,TAU); sctx.fill(); sctx.stroke();
+    sctx.beginPath(); sctx.moveTo(-3, b.r*1.05); sctx.lineTo(3, b.r*1.05); sctx.lineTo(0, b.r*1.25); sctx.closePath(); sctx.fill();
+    sctx.strokeStyle = 'rgba(255,255,255,.35)'; sctx.lineWidth = 1;
+    sctx.beginPath(); sctx.moveTo(0, b.r*1.25);
+    for (var i=1;i<=6;i++){
+      var yy = b.r*1.25 + i*10;
+      var xx = Math.sin((b.swayT*0.5 + i)*0.6) * 3;
+      sctx.lineTo(xx, yy);
+    }
+    sctx.stroke();
+    sctx.restore();
+  }
+  function pointInBalloon(x,y,b){
+    var dx = x - b.x, dy = y - b.y;
+    return (dx*dx + dy*dy) <= (b.r*1.05)*(b.r*1.05);
+  }
+
+  /* ---------- Loop ---------- */
+  var last = performance.now(), isDown=false;
+  function loop(now){
+    var dt = now - last; last = now;
+
+    // No smear: hard clear every frame; sparks themselves fade over time
+    sctx.clearRect(0,0,W,H);
+
+    // balloons
+    for (var i=0;i<balloons.length;i++){
+      var b = balloons[i];
+      if (!b || !b.alive) continue;
+      b.y += b.vy; b.swayT += 1; b.x += Math.sin(b.swayT * b.swayA * 60) * 0.7;
+      drawBalloon(b);
+      if (b.y < -60) balloons[i] = makeBalloon();
+    }
+
+    // rockets
+    for (var ri=rockets.length-1; ri>=0; ri--){
+      var r = rockets[ri];
+      if (!r || !r.alive){ rockets.splice(ri,1); continue; }
+      r.vy -= 0.03; r.x += r.vx; r.y += r.vy;
+
+      sctx.save(); sctx.fillStyle = '#fff';
+      sctx.beginPath(); sctx.arc(r.x, r.y, 2.2, 0, TAU); sctx.fill(); sctx.restore();
+
+      for (var k=0;k<2;k++){
+        addParticle({
+          x: r.x + Math.random()*3-1.5, y: r.y + Math.random()*2,
+          vx: Math.random()*1.2-0.6, vy: Math.random()*0.6+0.6,
+          life: 220+Math.random()*130, age:0, size:1.2+Math.random()*1.0,
+          hue: (220 + r.y*0.2) % 360, alpha:1, type:'trail',
+          drag:0.96, grav:0.02, flicker: Math.random()<0.4
+        });
+      }
+
+      if (r.y <= r.targetY){
+        r.alive = false;
+        if (r.whistle && typeof r.whistle.stop === 'function') { try{ r.whistle.stop(); }catch(e){} }
+        burst(r.x, r.y, 1.25);
+      }
+    }
+
+    // particles (sparks/flash + bright cursor particles)
+    sctx.globalCompositeOperation='lighter';
+    for (var pi=particles.length-1; pi>=0; pi--){
+      var p = particles[pi];
+      if (!p) { particles.splice(pi,1); continue; }
+      p.age += dt; if (p.age >= p.life){ particles.splice(pi,1); continue; }
+
+      // physics
+      p.vx *= p.drag; p.vy = p.vy*p.drag + p.grav; p.x += p.vx; p.y += p.vy;
+
+      var t = p.life ? (p.age/p.life) : 1;
+      var alpha = (p.type==='flash') ? (1 - t*t) : (1 - t);
+      if (p.type==='trail') alpha *= 0.8;
+      if (p.type==='cursor') alpha *= 0.95; // brighter, fades slower
+      var size = Math.max(0.5, p.size*(1 - t*0.6)); // cursor particles shrink slower
+
+      if (p.type==='flash'){
+        var g = sctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size);
+        g.addColorStop(0, 'hsla('+p.hue+',100%,75%,'+(alpha*0.85)+')');
+        g.addColorStop(1, 'hsla('+p.hue+',100%,50%,0)');
+        sctx.fillStyle = g; sctx.beginPath(); sctx.arc(p.x,p.y,p.size,0,TAU); sctx.fill();
+      }else{
+        // soft glow dot
+        var glow = sctx.createRadialGradient(p.x,p.y,0,p.x,p.y,size*3.2);
+        glow.addColorStop(0, 'hsla('+p.hue+',100%,65%,'+(alpha*0.55)+')');
+        glow.addColorStop(1, 'hsla('+p.hue+',100%,65%,0)');
+        sctx.fillStyle = glow; sctx.beginPath(); sctx.arc(p.x,p.y,size*2.6,0,TAU); sctx.fill();
+
+        // bright core
+        sctx.beginPath();
+        sctx.fillStyle = 'hsla('+p.hue+',100%,'+(p.type==='cursor'?68:55)+'%,'+alpha+')';
+        sctx.arc(p.x,p.y,size,0,TAU); sctx.fill();
+
+        // tiny comet streak for cursor sparks
+        if (p.type==='cursor'){
+          sctx.globalAlpha = alpha*0.85;
+          sctx.strokeStyle = 'hsla('+p.hue+',100%,75%,'+(alpha*0.9)+')';
+          sctx.lineWidth = 1.5;
+          sctx.beginPath();
+          sctx.moveTo(p.x, p.y);
+          sctx.lineTo(p.x - p.vx*2.6, p.y - p.vy*2.6);
+          sctx.stroke();
+          sctx.globalAlpha = 1;
+        }
+
+        if (p.flicker && Math.random()<0.18){
+          sctx.globalAlpha = alpha*0.7;
+          sctx.strokeStyle = 'hsla('+p.hue+',100%,75%,'+(alpha*0.7)+')';
+          sctx.beginPath(); sctx.moveTo(p.x,p.y); sctx.lineTo(p.x - p.vx*2, p.y - p.vy*2);
+          sctx.lineWidth = 1; sctx.stroke(); sctx.globalAlpha = 1;
+        }
+      }
+      if (p.x<-50||p.x>W+50||p.y>H+50) particles.splice(pi,1);
+    }
+
+    // move custom cursor
+    cursorEl.style.transform = 'translate(' + pointer.x + 'px,' + pointer.y + 'px)';
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ---------- Interaction ---------- */
+  var isDown=false;
+  function pointerDown(e){
+    isDown = true;
+    ensureAudio(); // create/resume audio after user gesture
+    rocket(e.clientX);
+  }
+  function pointerUp(){ isDown = false; }
+  window.addEventListener('pointerdown', pointerDown);
+  window.addEventListener('pointerup', pointerUp);
+
+  // Hold to barrage
+  setInterval(function(){ if(isDown && !prefersReduced) rocket(pointer.x); }, 240);
+
+  // Pop balloons
+  window.addEventListener('pointerdown', function(e){
+    var x=e.clientX, y=e.clientY;
+    for (var i=0;i<balloons.length;i++){
+      var b = balloons[i];
+      if (b && b.alive && pointInBalloon(x,y,b)){
+        b.alive = false; burst(b.x, b.y, 0.95); balloons[i] = makeBalloon(); break;
+      }
+    }
+  });
+
+  // Welcome rockets (silent to avoid autoplay issues)
+  setTimeout(function(){
+    for (var i=0;i<3;i++){
+      rockets.push({ x: W*(0.25+0.25*i), y:H-6, vx:rnd(-0.2,0.2), vy:-7.8-rnd(0,1),
+        targetY: H*(0.12 + 0.04*i), whistle:null, alive:true });
+    }
+  }, 450);
+
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden){ particles.length=0; rockets.length=0; }
+  });
+})();
+</script>
+</body>
+</html>

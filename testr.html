@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Your premier destination for casino games and personal finance tracking. Play exciting games, spin the bonus wheel, and manage your budget all in one place.">
+  <meta name="keywords" content="casino, gambling, games, spin wheel, budget tracker, personal finance">
+  <title>Lucky Budget | Casino Games & Finance Tracking</title>
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn.pixabay.com/photo/2017/06/10/07/22/dice-2389254_960_720.png" type="image/png">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Animation -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Custom Styles -->
+  <style id="app-style">
+    :root {
+      --primary: #0f172a;
+      --secondary: #1e293b;
+      --accent-pink: #ec4899;
+      --accent-blue: #38bdf8;
+      --accent-purple: #8b5cf6;
+      --text-light: #f1f5f9;
+      --text-dim: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--primary);
+      color: var(--text-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Neon text effect */
+    .neon-text {
+      text-shadow: 0 0 5px rgba(236, 72, 153, 0.7),
+                   0 0 10px rgba(236, 72, 153, 0.5),
+                   0 0 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .neon-blue {
+      text-shadow: 0 0 5px rgba(56, 189, 248, 0.7),
+                   0 0 10px rgba(56, 189, 248, 0.5),
+                   0 0 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .neon-purple {
+      text-shadow: 0 0 5px rgba(139, 92, 246, 0.7),
+                   0 0 10px rgba(139, 92, 246, 0.5),
+                   0 0 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .neon-border {
+      border: 2px solid var(--accent-pink);
+      box-shadow: 0 0 5px rgba(236, 72, 153, 0.7),
+                  0 0 10px rgba(236, 72, 153, 0.5);
+    }
+
+    /* Header and Navigation */
+    .header {
+      background-color: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: fixed;
+      width: 100%;
+      z-index: 100;
+      transition: all 0.3s ease;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .header-scrolled {
+      padding: 0.5rem 1.5rem;
+      background-color: rgba(15, 23, 42, 0.95);
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--accent-pink);
+    }
+
+    .logo-icon {
+      margin-right: 0.5rem;
+      font-size: 1.75rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+      margin-right: auto;
+      margin-left: 3rem;
+    }
+
+    .nav-link {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      transition: all 0.3s ease;
+      padding: 0.5rem 0;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--text-light);
+    }
+
+    .nav-link.active {
+      color: var(--accent-pink);
+    }
+
+    .nav-link.active::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent-pink);
+      box-shadow: 0 0 5px rgba(236, 72, 153, 0.7),
+                  0 0 10px rgba(236, 72, 153, 0.5);
+    }
+
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+    }
+
+    .nav-icon {
+      margin-right: 0.25rem;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding-top: 5rem;
+    }
+
+    .section {
+      padding: 4rem 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 3rem auto;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 8rem 1.5rem 4rem 1.5rem;
+      background: radial-gradient(circle at 50% 50%, var(--secondary), var(--primary) 70%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://cdn.pixabay.com/photo/2015/09/09/22/09/chips-933169_960_720.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.05;
+      z-index: -1;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      color: var(--text-dim);
+    }
+
+    .hero-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .btn-primary {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .btn-secondary {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 2px solid var(--accent-blue);
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(56, 189, 248, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(56, 189, 248, 0.2);
+    }
+
+    .stat-cards {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      width: 220px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent-pink);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--accent-blue);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    /* Games Section */
+    .games {
+      background-color: var(--secondary);
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background-color: rgba(15, 23, 42, 0.7);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-card:hover .game-img {
+      transform: scale(1.05);
+    }
+
+    .game-img-container {
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .game-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .game-content {
+      padding: 1.25rem;
+    }
+
+    .game-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    .game-type {
+      display: flex;
+      align-items: center;
+    }
+
+    .game-type-icon {
+      margin-right: 0.25rem;
+    }
+
+    .game-rating {
+      display: flex;
+      align-items: center;
+    }
+
+    .game-rating-icon {
+      color: #f59e0b;
+      margin-right: 0.25rem;
+    }
+
+    .game-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .game-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .game-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background-color: var(--accent-pink);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 1;
+    }
+
+    /* Spin Wheel Section */
+    .spin-wheel-section {
+      text-align: center;
+    }
+
+    .wheel-container {
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+      position: relative;
+    }
+
+    .wheel-canvas {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+
+    .wheel-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 15%;
+      height: 15%;
+      background-color: var(--accent-pink);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.7),
+                  0 0 30px rgba(236, 72, 153, 0.4);
+      z-index: 2;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .wheel-spinner:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .wheel-spinner-icon {
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .wheel-info {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .wheel-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .wheel-desc {
+      margin-bottom: 1.5rem;
+      color: var(--text-dim);
+    }
+
+    .spins-left {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .spins-count {
+      color: var(--accent-pink);
+      font-size: 1.25rem;
+    }
+
+    /* Budget Dashboard Section */
+    .budget-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .budget-tab {
+      padding: 0.75rem 1.5rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      color: var(--text-dim);
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .budget-tab.active {
+      color: var(--accent-blue);
+    }
+
+    .budget-tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--accent-blue);
+      box-shadow: 0 0 5px rgba(56, 189, 248, 0.7),
+                  0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .budget-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .budget-chart {
+      flex: 1;
+      min-width: 300px;
+      max-width: 600px;
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+    }
+
+    .budget-form {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+    }
+
+    .budget-card {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .budget-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent-blue);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      color: var(--text-light);
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      color: var(--text-light);
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .form-submit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .budget-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .budget-stat {
+      background-color: rgba(15, 23, 42, 0.7);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      min-width: 180px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .budget-stat-label {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .budget-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .budget-stat-good {
+      color: #10b981;
+    }
+
+    .budget-stat-warning {
+      color: #f59e0b;
+    }
+
+    .budget-stat-danger {
+      color: #ef4444;
+    }
+
+    /* Promotions Section */
+    .promo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .promo-card {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .promo-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .promo-img-container {
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .promo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .promo-card:hover .promo-img {
+      transform: scale(1.05);
+    }
+
+    .promo-content {
+      padding: 1.5rem;
+    }
+
+    .promo-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background-color: var(--accent-pink);
+      color: white;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .promo-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .promo-desc {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    .promo-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .promo-date {
+      color: var(--text-dim);
+    }
+
+    .promo-link {
+      color: var(--accent-blue);
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .promo-link:hover {
+      color: var(--accent-pink);
+    }
+
+    /* Blog Section */
+    .blog {
+      background-color: var(--primary);
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .blog-card {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .blog-img-container {
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .blog-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .blog-card:hover .blog-img {
+      transform: scale(1.05);
+    }
+
+    .blog-content {
+      padding: 1.5rem;
+    }
+
+    .blog-category {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background-color: var(--accent-blue);
+      color: white;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-excerpt {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    .blog-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .blog-author {
+      display: flex;
+      align-items: center;
+    }
+
+    .blog-author-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      object-fit: cover;
+    }
+
+    .blog-author-name {
+      color: var(--text-dim);
+    }
+
+    .blog-date {
+      color: var(--text-dim);
+    }
+
+    /* About Section */
+    .about {
+      background-color: var(--secondary);
+    }
+
+    .about-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .about-content {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .about-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--accent-pink);
+    }
+
+    .about-desc {
+      margin-bottom: 1.5rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    .about-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .about-feature {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .about-feature-icon {
+      margin-right: 1rem;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .about-feature-text {
+      flex: 1;
+    }
+
+    .about-feature-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .about-feature-desc {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .about-img-container {
+      flex: 1;
+      min-width: 300px;
+      text-align: center;
+    }
+
+    .about-img {
+      max-width: 100%;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* FAQ Section */
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .faq-question:hover {
+      background-color: rgba(56, 189, 248, 0.1);
+    }
+
+    .faq-question-text {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .faq-icon {
+      transition: transform 0.3s ease;
+      font-size: 1.25rem;
+      color: var(--accent-blue);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 1.25rem;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+      padding-bottom: 1.25rem;
+    }
+
+    .faq-answer-text {
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* Contact Section */
+    .contact-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .contact-form-container {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .contact-form {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      padding: 2rem;
+    }
+
+    .contact-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--accent-pink);
+    }
+
+    .contact-info {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .contact-card {
+      background-color: rgba(30, 41, 59, 0.7);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-icon {
+      margin-right: 1rem;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .contact-item-content {
+      flex: 1;
+    }
+
+    .contact-item-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-item-value {
+      color: var(--text-dim);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background-color: rgba(15, 23, 42, 0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      transform: translateY(-3px);
+    }
+
+    /* Footer */
+    .footer {
+      background-color: var(--secondary);
+      padding: 4rem 1.5rem 2rem 1.5rem;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3rem;
+      margin-bottom: 3rem;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      flex: 1;
+      min-width: 250px;
+      max-width: 300px;
+    }
+
+    .footer-logo-text {
+      display: flex;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--accent-pink);
+      margin-bottom: 1rem;
+    }
+
+    .footer-logo-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .footer-links-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      color: var(--text-light);
+    }
+
+    .footer-link-list {
+      list-style: none;
+    }
+
+    .footer-link-item {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-link {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--accent-blue);
+    }
+
+    .footer-newsletter {
+      flex: 1;
+      min-width: 250px;
+      max-width: 350px;
+    }
+
+    .footer-newsletter-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      color: var(--text-light);
+    }
+
+    .footer-newsletter-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .newsletter-form {
+      display: flex;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      padding: 0.75rem;
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px 0 0 4px;
+      color: var(--text-light);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .newsletter-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .newsletter-btn {
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 0 4px 4px 0;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .newsletter-btn:hover {
+      opacity: 0.9;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .footer-copyright {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-bottom-link {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .footer-bottom-link:hover {
+      color: var(--accent-blue);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 90%;
+      max-width: 500px;
+      background-color: var(--secondary);
+      border-radius: 0.75rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-backdrop.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--accent-pink);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    /* Tabs for Login/Register */
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+    }
+
+    .auth-tab.active {
+      border-bottom: 2px solid var(--accent-pink);
+      color: var(--accent-pink);
+    }
+
+    /* Game Detail Modal */
+    .game-detail-header {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .game-detail-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .game-detail-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem;
+      background: linear-gradient(to top, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0));
+    }
+
+    .game-detail-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-detail-subtitle {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .game-detail-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .game-detail-stat {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .game-detail-stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 0.25rem;
+    }
+
+    .game-detail-stat-value {
+      font-weight: 600;
+    }
+
+    .game-detail-desc {
+      margin-bottom: 1.5rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* Spin Result Modal */
+    .spin-result {
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .spin-result-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    .spin-result-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .spin-result-prize {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-pink);
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      to {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--secondary);
+      border-left: 4px solid var(--accent-pink);
+      border-radius: 4px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      min-width: 300px;
+      max-width: 400px;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-icon {
+      margin-right: 1rem;
+      font-size: 1.5rem;
+      color: var(--accent-pink);
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 1rem;
+      padding: 0.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .notification-close:hover {
+      color: var(--accent-pink);
+    }
+
+    /* 404 Page */
+    .error-page {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .error-content {
+      max-width: 600px;
+    }
+
+    .error-code {
+      font-size: 8rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .error-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .error-desc {
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+    }
+
+    /* Loader */
+    .loader {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--accent-pink);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .nav-links {
+        margin-left: 1.5rem;
+        gap: 1rem;
+      }
+
+      .hero-title {
+        font-size: 3rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0.75rem 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-actions {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .mobile-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--primary);
+        z-index: 200;
+        padding: 2rem 1.5rem;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .mobile-menu.active {
+        transform: translateX(0);
+      }
+
+      .mobile-menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .mobile-menu-close {
+        background: none;
+        border: none;
+        color: var(--text-light);
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .mobile-nav-links {
+        list-style: none;
+      }
+
+      .mobile-nav-link {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+
+      .mobile-nav-actions {
+        margin-top: 2rem;
+      }
+
+      .mobile-nav-btn {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+
+      .section {
+        padding: 3rem 1rem;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+      }
+
+      .about-title {
+        font-size: 2rem;
+      }
+
+      .contact-container {
+        flex-direction: column;
+      }
+
+      .footer-top {
+        flex-direction: column;
+        gap: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .stat-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .stat-card {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .hero-btns {
+        flex-direction: column;
+      }
+
+      .btn-primary, .btn-secondary {
+        width: 100%;
+      }
+
+      .about-title {
+        font-size: 1.75rem;
+      }
+
+      .about-feature {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .about-feature-icon {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-bottom-links {
+        justify-content: center;
+      }
+
+      .modal {
+        width: 95%;
+      }
+    }
+
+    /* CSS for the wheel canvas */
+    #wheel-canvas {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body x-data="app">
+  <!-- Header -->
+  <header class="header" :class="{ 'header-scrolled': scrolled }">
+    <div class="nav-container">
+      <a href="javascript:void(0)" class="logo neon-text">
+        <i class="fas fa-dice logo-icon"></i>
+        Lucky Budget
+      </a>
+      <ul class="nav-links">
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'home' }" @click="changePage('home')">Home</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'games' }" @click="changePage('games')">Games</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'spin-wheel' }" @click="changePage('spin-wheel')">Spin Wheel</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'budget' }" @click="changePage('budget')">Budget Dashboard</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'promotions' }" @click="changePage('promotions')">Promotions</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'blog' }" @click="changePage('blog')">Blog</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'about' }" @click="changePage('about')">About</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'faq' }" @click="changePage('faq')">FAQ</a></li>
+        <li><a href="javascript:void(0)" class="nav-link" :class="{ 'active': currentPage === 'contact' }" @click="changePage('contact')">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="nav-btn" @click="openLoginModal()">
+          <i class="fas fa-user nav-icon"></i> Sign In
+        </button>
+      </div>
+      <button class="mobile-menu-btn" @click="toggleMobileMenu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" :class="{ 'active': mobileMenuOpen }">
+    <div class="mobile-menu-header">
+      <a href="javascript:void(0)" class="logo neon-text">
+        <i class="fas fa-dice logo-icon"></i>
+        Lucky Budget
+      </a>
+      <button class="mobile-menu-close" @click="toggleMobileMenu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('home')">Home</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('games')">Games</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('spin-wheel')">Spin Wheel</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('budget')">Budget Dashboard</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('promotions')">Promotions</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('blog')">Blog</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('about')">About</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('faq')">FAQ</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('contact')">Contact</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('terms')">Terms & Conditions</a></li>
+      <li class="mobile-nav-link"><a href="javascript:void(0)" @click="navigateMobile('responsible')">Responsible Gaming</a></li>
+    </ul>
+    <div class="mobile-nav-actions">
+      <button class="nav-btn mobile-nav-btn" @click="openLoginModal(); toggleMobileMenu()">
+        <i class="fas fa-user nav-icon"></i> Sign In
+      </button>
+      <button class="btn-secondary mobile-nav-btn" @click="openLoginModal('register'); toggleMobileMenu()">
+        <i class="fas fa-user-plus nav-icon"></i> Register
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Home Page -->
+    <section x-show="currentPage === 'home'" class="hero" x-transition>
+      <div class="hero-content">
+        <h1 class="hero-title animate__animated animate__fadeInUp">PLAY SMART, BUDGET SMARTER</h1>
+        <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">Enjoy premium casino games while keeping track of your finances all in one place</p>
+        <div class="hero-btns animate__animated animate__fadeInUp animate__delay-2s">
+          <button class="btn-primary" @click="changePage('games')">
+            <i class="fas fa-gamepad"></i> Play Now
+          </button>
+          <button class="btn-secondary" @click="changePage('budget')">
+            <i class="fas fa-chart-pie"></i> Track Finances
+          </button>
+        </div>
+        <div class="stat-cards animate__animated animate__fadeInUp animate__delay-3s">
+          <div class="stat-card">
+            <i class="fas fa-users stat-icon"></i>
+            <div class="stat-value">10,000+</div>
+            <div class="stat-label">Active Players</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-trophy stat-icon"></i>
+            <div class="stat-value">$1M+</div>
+            <div class="stat-label">Prizes Awarded</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-gamepad stat-icon"></i>
+            <div class="stat-value">50+</div>
+            <div class="stat-label">Games Available</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-chart-line stat-icon"></i>
+            <div class="stat-value">95%</div>
+            <div class="stat-label">Budget Success</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Games Page -->
+    <section x-show="currentPage === 'games'" class="section games" x-transition>
+      <h2 class="section-title neon-blue">Featured Games</h2>
+      <p class="section-subtitle">Explore our extensive collection of casino games and start playing today!</p>
+      <div class="games-grid">
+        <template x-for="game in games" :key="game.id">
+          <div class="game-card" @click="openGameDetail(game)">
+            <div x-show="game.isNew" class="game-badge">NEW</div>
+            <div class="game-img-container">
+              <img :src="game.image" :alt="game.name" class="game-img">
+            </div>
+            <div class="game-content">
+              <h3 class="game-title" x-text="game.name"></h3>
+              <div class="game-info">
+                <div class="game-type">
+                  <i class="fas fa-tag game-type-icon"></i>
+                  <span x-text="game.type"></span>
+                </div>
+                <div class="game-rating">
+                  <i class="fas fa-star game-rating-icon"></i>
+                  <span x-text="game.rating"></span>
+                </div>
+              </div>
+              <button class="game-btn">
+                <i class="fas fa-play"></i> Play Now
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- Spin Wheel Page -->
+    <section x-show="currentPage === 'spin-wheel'" class="section spin-wheel-section" x-transition>
+      <h2 class="section-title neon-text">Bonus Wheel</h2>
+      <p class="section-subtitle">Spin the wheel and win amazing prizes! Each spin can lead to exciting rewards.</p>
+      <div class="wheel-container">
+        <canvas id="wheel-canvas" class="wheel-canvas"></canvas>
+        <div class="wheel-spinner" @click="spinWheel">
+          <i class="fas fa-arrow-down wheel-spinner-icon"></i>
+        </div>
+      </div>
+      <div class="wheel-info">
+        <h3 class="wheel-title">Daily Bonus Wheel</h3>
+        <p class="wheel-desc">Log in every day to get a free spin on our bonus wheel. Win free spins, deposit bonuses, cashback offers, and more!</p>
+        <div class="spins-left">You have <span class="spins-count">3</span> spins left today</div>
+      </div>
+    </section>
+
+    <!-- Budget Dashboard Page -->
+    <section x-show="currentPage === 'budget'" class="section" x-transition>
+      <h2 class="section-title neon-purple">Budget Dashboard</h2>
+      <p class="section-subtitle">Track your spending, set budgets, and analyze your financial habits with our powerful tools.</p>
+      
+      <div class="budget-tabs">
+        <div class="budget-tab" :class="{ 'active': budgetTab === 'weekly' }" @click="budgetTab = 'weekly'">Weekly</div>
+        <div class="budget-tab" :class="{ 'active': budgetTab === 'monthly' }" @click="budgetTab = 'monthly'">Monthly</div>
+        <div class="budget-tab" :class="{ 'active': budgetTab === 'yearly' }" @click="budgetTab = 'yearly'">Yearly</div>
+      </div>
+      
+      <div class="budget-content">
+        <div class="budget-chart">
+          <canvas id="budgetChart"></canvas>
+        </div>
+        
+        <div class="budget-form">
+          <div class="budget-card">
+            <h3 class="budget-card-title">Add New Expense</h3>
+            <form @submit.prevent="addExpense">
+              <div class="form-group">
+                <label for="expense-title" class="form-label">Title</label>
+                <input type="text" id="expense-title" class="form-input" placeholder="e.g. Groceries" required>
+              </div>
+              <div class="form-group">
+                <label for="expense-amount" class="form-label">Amount</label>
+                <input type="number" id="expense-amount" class="form-input" placeholder="0.00" min="0" step="0.01" required>
+              </div>
+              <div class="form-group">
+                <label for="expense-category" class="form-label">Category</label>
+                <select id="expense-category" class="form-select" required>
+                  <option value="">Select category</option>
+                  <option value="food">Food & Dining</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="gambling">Gambling</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="bills">Bills & Utilities</option>
+                  <option value="transport">Transportation</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="expense-date" class="form-label">Date</label>
+                <input type="date" id="expense-date" class="form-input" required>
+              </div>
+              <button type="submit" class="form-submit">
+                <i class="fas fa-plus"></i> Add Expense
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <div class="budget-summary">
+        <div class="budget-stat">
+          <div class="budget-stat-label">Total Spent</div>
+          <div class="budget-stat-value">$1,250.00</div>
+        </div>
+        <div class="budget-stat">
+          <div class="budget-stat-label">Budget</div>
+          <div class="budget-stat-value">$2,000.00</div>
+        </div>
+        <div class="budget-stat">
+          <div class="budget-stat-label">Remaining</div>
+          <div class="budget-stat-value budget-stat-good">$750.00</div>
+        </div>
+        <div class="budget-stat">
+          <div class="budget-stat-label">Gaming Budget</div>
+          <div class="budget-stat-value budget-stat-warning">$230.00</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Promotions Page -->
+    <section x-show="currentPage === 'promotions'" class="section" x-transition>
+      <h2 class="section-title neon-blue">Promotions</h2>
+      <p class="section-subtitle">Check out our latest promotions, bonuses, and special offers.</p>
+      <div class="promo-grid">
+        <div class="promo-card">
+          <div class="promo-img-container">
+            <img src="https://cdn.pixabay.com/photo/2017/08/08/20/57/casino-chips-2613135_960_720.jpg" alt="Welcome Bonus" class="promo-img">
+          </div>
+          <div class="promo-content">
+            <div class="promo-badge">NEW PLAYERS</div>
+            <h3 class="promo-title">Welcome Package: 100% up to $500</h3>
+            <p class="promo-desc">Start your journey with a bang! Receive a 100% match on your first deposit up to $500 plus 50 free spins.</p>
+            <div class="promo-footer">
+              <span class="promo-date">Valid until: Dec 31, 2025</span>
+              <a href="javascript:void(0)" class="promo-link">Claim Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="promo-card">
+          <div class="promo-img-container">
+            <img src="https://cdn.pixabay.com/photo/2015/11/07/11/18/roulette-1031043_960_720.jpg" alt="Weekend Cashback" class="promo-img">
+          </div>
+          <div class="promo-content">
+            <div class="promo-badge">WEEKEND OFFER</div>
+            <h3 class="promo-title">Weekend Cashback: 15% up to $200</h3>
+            <p class="promo-desc">Didn't have luck on the weekend? We've got you covered with 15% cashback on your losses.</p>
+            <div class="promo-footer">
+              <span class="promo-date">Every Weekend</span>
+              <a href="javascript:void(0)" class="promo-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="promo-card">
+          <div class="promo-img-container">
+            <img src="https://cdn.pixabay.com/photo/2019/04/26/07/02/gambling-4156659_960_720.jpg" alt="VIP Program" class="promo-img">
+          </div>
+          <div class="promo-content">
+            <div class="promo-badge">VIP</div>
+            <h3 class="promo-title">VIP Loyalty Program</h3>
+            <p class="promo-desc">Join our exclusive VIP program and enjoy personalized bonuses, dedicated support, and special events.</p>
+            <div class="promo-footer">
+              <span class="promo-date">Ongoing</span>
+              <a href="javascript:void(0)" class="promo-link">Join Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog Page -->
+    <section x-show="currentPage === 'blog'" class="section blog" x-transition>
+      <h2 class="section-title neon-text">Blog & News</h2>
+      <p class="section-subtitle">Stay updated with the latest gaming trends, personal finance tips, and casino news.</p>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-img-container">
+            <img src="https://cdn.pixabay.com/photo/2018/01/17/04/14/industry-3087393_960_720.jpg" alt="Budget Management" class="blog-img">
+          </div>
+          <div class="blog-content">
+            <div class="blog-category">Finance Tips</div>
+            <h3 class="blog-title">How to Manage Your Gaming Budget Effectively</h3>
+            <p class="blog-excerpt">Learn the best strategies to keep your gaming budget under control while maximizing your entertainment value.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <img src="https://cdn.pixabay.com/photo/2016/11/18/19/07/happy-1836445_960_720.jpg" alt="Author" class="blog-author-img">
+                <span class="blog-author-name">Sarah Johnson</span>
+              </div>
+              <span class="blog-date">May 15, 2025</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="blog-card">
+          <div class="blog-img-container">
+            <img src="https://cdn.pixabay.com/photo/2016/11/29/05/45/finances-1867496_960_720.jpg" alt="Money Management" class="blog-img">
+          </div>
+          <div class="blog-content">
+            <div class="blog-category">Personal Finance</div>
+            <h3 class="blog-title">5 Money Management Rules Every Player Should Follow</h3>
+            <p class="blog-excerpt">Discover essential financial principles that will help you maintain a healthy relationship with gambling.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <img src="https://cdn.pixabay.com/photo/2016/11/21/12/42/beard-1845166_960_720.jpg" alt="Author" class="blog-author-img">
+                <span class="blog-author-name">Michael Chen</span>
+              </div>
+              <span class="blog-date">May 10, 2025</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="blog-card">
+          <div class="blog-img-container">
+            <img src="https://cdn.pixabay.com/photo/2019/11/11/04/33/casino-4617737_960_720.jpg" alt="Casino Trends" class="blog-img">
+          </div>
+          <div class="blog-content">
+            <div class="blog-category">Industry News</div>
+            <h3 class="blog-title">Top Casino Trends to Watch in 2025</h3>
+            <p class="blog-excerpt">Stay ahead of the curve with our analysis of the latest trends shaping the online casino industry this year.</p>
+            <div class="blog-footer">
+              <div class="blog-author">
+                <img src="https://cdn.pixabay.com/photo/2017/02/16/23/10/smile-2072907_960_720.jpg" alt="Author" class="blog-author-img">
+                <span class="blog-author-name">Alex Thompson</span>
+              </div>
+              <span class="blog-date">May 5, 2025</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Page -->
+    <section x-show="currentPage === 'about'" class="section about" x-transition>
+      <div class="about-container">
+        <div class="about-content">
+          <h2 class="about-title">About Lucky Budget</h2>
+          <p class="about-desc">Lucky Budget is a revolutionary platform that combines premium casino gaming with personal finance management tools. Our mission is to promote responsible gambling by helping players track their spending and set healthy limits.</p>
+          <p class="about-desc">Founded in 2023 by a team of finance experts and gaming enthusiasts, we've quickly grown to become a trusted name in the industry.</p>
+          
+          <ul class="about-features">
+            <li class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Licensed & Secure</h4>
+                <p class="about-feature-desc">Fully licensed operation with state-of-the-art security protocols to protect your data and funds.</p>
+              </div>
+            </li>
+            <li class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Finance Tools</h4>
+                <p class="about-feature-desc">Advanced budgeting tools to help you manage your gambling expenses within your means.</p>
+              </div>
+            </li>
+            <li class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-gamepad"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Premium Games</h4>
+                <p class="about-feature-desc">Partnerships with leading game developers to offer you the best gaming experience.</p>
+              </div>
+            </li>
+          </ul>
+          
+          <button class="btn-primary">
+            <i class="fas fa-info-circle"></i> Learn More
+          </button>
+        </div>
+        
+        <div class="about-img-container">
+          <img src="https://cdn.pixabay.com/photo/2018/02/01/21/23/administration-3124007_960_720.jpg" alt="About Us" class="about-img">
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Page -->
+    <section x-show="currentPage === 'faq'" class="section" x-transition>
+      <h2 class="section-title neon-blue">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Find answers to the most common questions about our platform.</p>
+      
+      <div class="faq-container">
+        <div class="faq-item" :class="{ 'active': faqActive === 1 }">
+          <div class="faq-question" @click="toggleFaq(1)">
+            <div class="faq-question-text">How do I create an account?</div>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="faq-answer-text">Creating an account is simple! Click on the 'Sign In' button in the top right corner and select 'Register'. Fill in your details, verify your email, and you're ready to go! The process takes less than 2 minutes.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" :class="{ 'active': faqActive === 2 }">
+          <div class="faq-question" @click="toggleFaq(2)">
+            <div class="faq-question-text">How does the budget tracking system work?</div>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="faq-answer-text">Our budget tracking system allows you to set monthly, weekly, or daily gambling limits. You can track your expenses, visualize spending patterns, and receive notifications when approaching your limits. All data is displayed in easy-to-understand charts and graphs.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" :class="{ 'active': faqActive === 3 }">
+          <div class="faq-question" @click="toggleFaq(3)">
+            <div class="faq-question-text">What payment methods do you accept?</div>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="faq-answer-text">We accept a wide range of payment methods including credit/debit cards (Visa, MasterCard), e-wallets (PayPal, Skrill, Neteller), bank transfers, and cryptocurrency (Bitcoin, Ethereum). All transactions are secure and encrypted.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" :class="{ 'active': faqActive === 4 }">
+          <div class="faq-question" @click="toggleFaq(4)">
+            <div class="faq-question-text">How does the Spin Wheel work?</div>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="faq-answer-text">The Spin Wheel is our daily bonus feature. Every 24 hours, you can spin the wheel to win various prizes including free spins, bonus cash, deposit matches, and more. The wheel uses a random number generator to ensure fair results for all players.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item" :class="{ 'active': faqActive === 5 }">
+          <div class="faq-question" @click="toggleFaq(5)">
+            <div class="faq-question-text">Is my personal and financial information secure?</div>
+            <i class="fas fa-chevron-down faq-icon"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="faq-answer-text">Absolutely! We employ industry-leading encryption technology (SSL) to protect all data transmissions. Your financial information is never stored on our servers, and we comply with strict data protection regulations. Our platform undergoes regular security audits to ensure the highest level of protection.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Page -->
+    <section x-show="currentPage === 'contact'" class="section" x-transition>
+      <h2 class="section-title neon-text">Contact Us</h2>
+      <p class="section-subtitle">Have questions or feedback? We'd love to hear from you!</p>
+      
+      <div class="contact-container">
+        <div class="contact-form-container">
+          <div class="contact-form">
+            <h3 class="contact-title">Send Us a Message</h3>
+            <form @submit.prevent="submitContactForm">
+              <div class="form-group">
+                <label for="contact-name" class="form-label">Name</label>
+                <input type="text" id="contact-name" class="form-input" placeholder="Your full name" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-email" class="form-label">Email</label>
+                <input type="email" id="contact-email" class="form-input" placeholder="Your email address" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-subject" class="form-label">Subject</label>
+                <input type="text" id="contact-subject" class="form-input" placeholder="What is this regarding?" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-message" class="form-label">Message</label>
+                <textarea id="contact-message" class="form-input" rows="5" placeholder="Type your message here..." required></textarea>
+              </div>
+              <button type="submit" class="form-submit">
+                <i class="fas fa-paper-plane"></i> Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+        
+        <div class="contact-info">
+          <div class="contact-card">
+            <h3 class="contact-title">Get in Touch</h3>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="contact-item-content">
+                <h4 class="contact-item-title">Email</h4>
+                <div class="contact-item-value">support@luckybudget.com</div>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="contact-item-content">
+                <h4 class="contact-item-title">Phone</h4>
+                <div class="contact-item-value">+1 (555) 123-4567</div>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="contact-item-content">
+                <h4 class="contact-item-title">Support Hours</h4>
+                <div class="contact-item-value">24/7, 365 days a year</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="contact-card">
+            <h3 class="contact-title">Follow Us</h3>
+            <div class="social-links">
+              <a href="javascript:void(0)" class="social-link">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="social-link">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="social-link">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="social-link">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="javascript:void(0)" class="social-link">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terms Page -->
+    <section x-show="currentPage === 'terms'" class="section" x-transition>
+      <h2 class="section-title">Terms & Conditions</h2>
+      <div class="about-container">
+        <div class="about-content" style="max-width: 800px; margin: 0 auto;">
+          <p class="about-desc">Last updated: May 1, 2025</p>
+          <p class="about-desc">Please read these Terms & Conditions carefully before using the Lucky Budget platform.</p>
+          <p class="about-desc">By accessing or using our service, you agree to be bound by these Terms. If you disagree with any part of the terms, you may not access the service.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">1. Accounts</h3>
+          <p class="about-desc">When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">2. Gambling Regulations</h3>
+          <p class="about-desc">Users must be at least 18 years old (or the legal gambling age in their jurisdiction) to use our services. Users are responsible for ensuring that their use of our platform complies with local laws and regulations regarding online gambling.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">3. Budget Management Tools</h3>
+          <p class="about-desc">The budget management tools provided are for guidance purposes only. While we strive to provide accurate information, we cannot guarantee the accuracy of all financial calculations or recommendations.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">4. Intellectual Property</h3>
+          <p class="about-desc">The Service and its original content, features, and functionality are and will remain the exclusive property of Lucky Budget and its licensors. The service is protected by copyright, trademark, and other laws.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">5. Termination</h3>
+          <p class="about-desc">We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-blue);">6. Changes to Terms</h3>
+          <p class="about-desc">We reserve the right, at our sole discretion, to modify or replace these Terms at any time. It is your responsibility to review these Terms periodically for changes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Responsible Gaming Page -->
+    <section x-show="currentPage === 'responsible'" class="section" x-transition>
+      <h2 class="section-title neon-purple">Responsible Gaming</h2>
+      <div class="about-container">
+        <div class="about-content" style="max-width: 800px; margin: 0 auto;">
+          <p class="about-desc">At Lucky Budget, we are committed to promoting responsible gambling. We believe that gambling should be an enjoyable form of entertainment, not a way to make money or escape problems.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-pink);">Our Commitment</h3>
+          <p class="about-desc">We provide tools and resources to help you maintain control over your gambling activities. Our integrated budget tracking system is designed specifically to help you manage your finances responsibly.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-pink);">Self-Assessment</h3>
+          <p class="about-desc">Ask yourself these questions to evaluate your gambling habits:</p>
+          <ul style="list-style: disc; margin-left: 2rem; color: var(--text-dim); margin-bottom: 1.5rem;">
+            <li>Are you spending more time or money on gambling than you intended?</li>
+            <li>Have you tried to cut down or stop gambling without success?</li>
+            <li>Do you gamble to escape problems or to feel better?</li>
+            <li>Have you lied about your gambling habits to family or friends?</li>
+            <li>Have you risked important relationships or opportunities due to gambling?</li>
+          </ul>
+          <p class="about-desc">If you answered yes to any of these questions, we encourage you to consider using our responsible gambling tools or seeking additional support.</p>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-pink);">Our Tools</h3>
+          <div class="about-features">
+            <div class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Deposit Limits</h4>
+                <p class="about-feature-desc">Set daily, weekly, or monthly limits on how much you can deposit.</p>
+              </div>
+            </div>
+            <div class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-hourglass-half"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Time Limits</h4>
+                <p class="about-feature-desc">Set reminders to alert you when you've been playing for an extended period.</p>
+              </div>
+            </div>
+            <div class="about-feature">
+              <div class="about-feature-icon">
+                <i class="fas fa-pause-circle"></i>
+              </div>
+              <div class="about-feature-text">
+                <h4 class="about-feature-title">Self-Exclusion</h4>
+                <p class="about-feature-desc">Take a break from gambling by blocking access to your account for a specified period.</p>
+              </div>
+            </div>
+          </div>
+          
+          <h3 style="margin: 1.5rem 0 1rem 0; color: var(--accent-pink);">Need Help?</h3>
+          <p class="about-desc">If you or someone you know is struggling with gambling problems, please contact one of these support organizations:</p>
+          <ul style="list-style: none; margin-bottom: 1.5rem;">
+            <li style="margin-bottom: 0.5rem;"><strong>National Problem Gambling Helpline:</strong> 1-800-522-4700</li>
+            <li style="margin-bottom: 0.5rem;"><strong>Gamblers Anonymous:</strong> www.gamblersanonymous.org</li>
+            <li><strong>National Council on Problem Gambling:</strong> www.ncpgambling.org</li>
+          </ul>
+          
+          <button class="btn-primary">
+            <i class="fas fa-shield-alt"></i> Set Your Gambling Limits
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 404 Page -->
+    <section x-show="currentPage === '404'" class="error-page" x-transition>
+      <div class="error-content">
+        <div class="error-code">404</div>
+        <h2 class="error-title">Oops! Page Not Found</h2>
+        <p class="error-desc">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <button class="btn-primary" @click="changePage('home')">
+          <i class="fas fa-home"></i> Back to Home
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-logo">
+          <div class="footer-logo-text">
+            <i class="fas fa-dice logo-icon"></i>
+            Lucky Budget
+          </div>
+          <p class="footer-logo-desc">Combining premium casino gaming with smart financial tracking tools for a responsible gaming experience.</p>
+          <div class="social-links">
+            <a href="javascript:void(0)" class="social-link">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="javascript:void(0)" class="social-link">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="javascript:void(0)" class="social-link">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="javascript:void(0)" class="social-link">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="footer-links">
+          <h3 class="footer-links-title">Quick Links</h3>
+          <ul class="footer-link-list">
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('home')">Home</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('games')">Games</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('spin-wheel')">Spin Wheel</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('budget')">Budget Dashboard</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('promotions')">Promotions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-links">
+          <h3 class="footer-links-title">Support</h3>
+          <ul class="footer-link-list">
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('about')">About Us</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('faq')">FAQ</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('contact')">Contact</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('terms')">Terms & Conditions</a></li>
+            <li class="footer-link-item"><a href="javascript:void(0)" class="footer-link" @click="changePage('responsible')">Responsible Gaming</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-newsletter">
+          <h3 class="footer-newsletter-title">Newsletter</h3>
+          <p class="footer-newsletter-desc">Subscribe to our newsletter to receive updates on new games, promotions, and financial tips.</p>
+          <form class="newsletter-form" @submit.prevent="subscribeNewsletter">
+            <input type="email" class="newsletter-input" placeholder="Your email address" required>
+            <button type="submit" class="newsletter-btn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          © 2025 Lucky Budget. All rights reserved.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="javascript:void(0)" class="footer-bottom-link">Privacy Policy</a>
+          <a href="javascript:void(0)" class="footer-bottom-link">Cookies Policy</a>
+          <a href="javascript:void(0)" class="footer-bottom-link">Affiliates</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal-backdrop" :class="{ 'active': showLoginModal }">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Account Access</h3>
+        <button class="modal-close" @click="closeLoginModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <div class="auth-tab" :class="{ 'active': authTab === 'login' }" @click="authTab = 'login'">Login</div>
+          <div class="auth-tab" :class="{ 'active': authTab === 'register' }" @click="authTab = 'register'">Register</div>
+        </div>
+        
+        <!-- Login Form -->
+        <form x-show="authTab === 'login'" @submit.prevent="loginUser">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Email Address</label>
+            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password" class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            <label>
+              <input type="checkbox"> Remember me
+            </label>
+            <a href="javascript:void(0)" style="color: var(--accent-blue);">Forgot password?</a>
+          </div>
+          <button type="submit" class="form-submit">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+        
+        <!-- Register Form -->
+        <form x-show="authTab === 'register'" @submit.prevent="registerUser">
+          <div class="form-group">
+            <label for="register-name" class="form-label">Full Name</label>
+            <input type="text" id="register-name" class="form-input" placeholder="Enter your full name" required>
+          </div>
+          <div class="form-group">
+            <label for="register-email" class="form-label">Email Address</label>
+            <input type="email" id="register-email" class="form-input" placeholder="Enter your email" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password" class="form-label">Password</label>
+            <input type="password" id="register-password" class="form-input" placeholder="Create a password" required>
+          </div>
+          <div class="form-group">
+            <label for="register-confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="register-confirm" class="form-input" placeholder="Confirm your password" required>
+          </div>
+          <div style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+            <label>
+              <input type="checkbox" required> I am at least 18 years old and accept the <a href="javascript:void(0)" style="color: var(--accent-blue);" @click="changePage('terms'); closeLoginModal()">Terms & Conditions</a>
+            </label>
+          </div>
+          <button type="submit" class="form-submit">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Detail Modal -->
+  <div class="modal-backdrop" :class="{ 'active': showGameModal }">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Game Details</h3>
+        <button class="modal-close" @click="closeGameModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" x-show="selectedGame">
+        <div class="game-detail-header">
+          <img :src="selectedGame?.image" :alt="selectedGame?.name" class="game-detail-img">
+          <div class="game-detail-overlay">
+            <h3 class="game-detail-title" x-text="selectedGame?.name"></h3>
+            <div class="game-detail-subtitle" x-text="selectedGame?.type"></div>
+          </div>
+        </div>
+        <div style="padding: 1.5rem 0;">
+          <div class="game-detail-info">
+            <div class="game-detail-stat">
+              <div class="game-detail-stat-label">Rating</div>
+              <div class="game-detail-stat-value"><i class="fas fa-star" style="color: #f59e0b;"></i> <span x-text="selectedGame?.rating"></span>/5.0</div>
+            </div>
+            <div class="game-detail-stat">
+              <div class="game-detail-stat-label">Provider</div>
+              <div class="game-detail-stat-value" x-text="selectedGame?.provider"></div>
+            </div>
+            <div class="game-detail-stat">
+              <div class="game-detail-stat-label">Min Bet</div>
+              <div class="game-detail-stat-value" x-text="'$' + selectedGame?.minBet"></div>
+            </div>
+            <div class="game-detail-stat">
+              <div class="game-detail-stat-label">Max Bet</div>
+              <div class="game-detail-stat-value" x-text="'$' + selectedGame?.maxBet"></div>
+            </div>
+          </div>
+          <div class="game-detail-desc" x-text="selectedGame?.description"></div>
+          <button class="btn-primary" style="width: 100%;">
+            <i class="fas fa-play"></i> Play Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spin Result Modal -->
+  <div class="modal-backdrop" :class="{ 'active': showSpinResultModal }">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Wheel Result</h3>
+        <button class="modal-close" @click="closeSpinResultModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="spin-result">
+          <div class="spin-result-icon">
+            <i class="fas fa-gift" style="color: var(--accent-pink);"></i>
+          </div>
+          <h3 class="spin-result-title">Congratulations!</h3>
+          <div class="spin-result-prize" x-text="spinResult"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" @click="closeSpinResultModal">
+          Maybe Later
+        </button>
+        <button class="btn-primary" @click="claimPrize">
+          <i class="fas fa-check-circle"></i> Claim Prize
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" :class="{ 'show': showNotification }">
+    <div class="notification-icon">
+      <i :class="notificationIcon"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title" x-text="notificationTitle"></div>
+      <div class="notification-message" x-text="notificationMessage"></div>
+    </div>
+    <button class="notification-close" @click="closeNotification">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Alpine.js App Script -->
+  <script id="app-script">
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('app', () => ({
+        currentPage: 'home',
+        scrolled: false,
+        mobileMenuOpen: false,
+        authTab: 'login',
+        budgetTab: 'monthly',
+        faqActive: null,
+        showLoginModal: false,
+        showGameModal: false,
+        showSpinResultModal: false,
+        selectedGame: null,
+        spinResult: '',
+        showNotification: false,
+        notificationTitle: '',
+        notificationMessage: '',
+        notificationIcon: '',
+        wheel: null,
+        budgetChart: null,
+        
+        games: [
+          {
+            id: 1,
+            name: "Diamond Jackpot",
+            type: "Slot Machine",
+            rating: 4.8,
+            provider: "NextGen Gaming",
+            minBet: 0.10,
+            maxBet: 100,
+            image: "https://cdn.pixabay.com/photo/2019/11/11/04/33/casino-4617737_960_720.jpg",
+            description: "A dazzling 5-reel slot with 20 paylines featuring stunning diamond graphics, wilds, scatters, and a progressive jackpot that can be won at any time. Free spins feature with 3x multiplier!",
+            isNew: true
+          },
+          {
+            id: 2,
+            name: "Royal Blackjack",
+            type: "Card Game",
+            rating: 4.7,
+            provider: "Evolution Gaming",
+            minBet: 1,
+            maxBet: 500,
+            image: "https://cdn.pixabay.com/photo/2019/01/13/08/12/casino-3930462_960_720.jpg",
+            description: "Classic blackjack with a royal twist. Play against the dealer with up to 3 hands simultaneously. Special side bets available including Perfect Pairs and 21+3 for extra chances to win big.",
+            isNew: false
+          },
+          {
+            id: 3,
+            name: "Lucky Roulette",
+            type: "Table Game",
+            rating: 4

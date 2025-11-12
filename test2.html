@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Floating Calendar Widget</title>
+  <style>
+    :root {
+      --accent: #ef476f;
+      --bg: #0f1724;
+      --card: #0b1220;
+      --muted: #9aa4b2
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+      background: linear-gradient(180deg, #0b1220, #071028);
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      color: #e6eef6
+    }
+
+    /* Floating widget container */
+    .calendar-widget {
+      width: 320px;
+      max-width: 95vw;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.7);
+      overflow: hidden;
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 9999;
+      border: 1px solid rgba(255, 255, 255, 0.04)
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .title {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(239, 71, 111, 0.25)
+    }
+
+    .month {
+      font-weight: 600
+    }
+
+    .controls {
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+
+    button.icon {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px
+    }
+
+    button.icon:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      padding: 12px
+    }
+
+    .weekday {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .day {
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer
+    }
+
+    .day:hover {
+      background: rgba(255, 255, 255, 0.02)
+    }
+
+    .today {
+      border: 1px solid rgba(239, 71, 111, 0.4)
+    }
+
+    .selected {
+      background: linear-gradient(90deg, rgba(239, 71, 111, 0.14), rgba(239, 71, 111, 0.06));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02)
+    }
+
+    .other-month {
+      opacity: 0.35
+    }
+
+    .footer {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .add-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), #ffd166);
+      border: 0;
+      color: #071028;
+      font-weight: 600;
+      cursor: pointer
+    }
+
+    /* Events panel */
+    .events {
+      max-height: 220px;
+      overflow: auto;
+      padding: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.02)
+    }
+
+    .event {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.02)
+    }
+
+    .event .meta {
+      opacity: 0.9
+    }
+
+    .event .delete {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      cursor: pointer
+    }
+
+    /* collapse/hide */
+    .minimized {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      padding: 0;
+      overflow: visible
+    }
+
+    .minimized .header,
+    .minimized .grid,
+    .minimized .footer,
+    .minimized .events {
+      display: none
+    }
+
+    .minimized .dot {
+      display: block;
+      margin: auto
+    }
+
+    /* small input modal */
+    .modal {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.6));
+      z-index: 10000
+    }
+
+    .modal.show {
+      display: flex
+    }
+
+    .card {
+      background: #071022;
+      padding: 16px;
+      border-radius: 10px;
+      min-width: 320px;
+      border: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .card label {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .card input,
+    .card textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: transparent;
+      color: inherit
+    }
+
+    .card .row {
+      display: flex;
+      gap: 8px
+    }
+
+    @media (max-width:420px) {
+      .calendar-widget {
+        right: 12px;
+        bottom: 12px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="widget" class="calendar-widget" role="application" aria-label="Floating calendar widget">
+    <div class="header">
+      <div class="title">
+        <span class="dot" aria-hidden="true"></span>
+        <div>
+          <div class="month" id="monthLabel">Month</div>
+          <div class="muted" id="dayLabel" style="font-size:12px;color:var(--muted)"></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="icon" id="prevBtn" title="Previous month">◀</button>
+        <button class="icon" id="nextBtn" title="Next month">▶</button>
+        <button class="icon" id="minBtn" title="Minimize">▢</button>
+      </div>
+    </div>
+
+    <div class="grid" id="calGrid" aria-hidden="false"></div>
+
+    <div class="events" id="eventsList"></div>
+
+    <div class="footer">
+      <button class="add-btn" id="addEventBtn">+ Add Event</button>
+    </div>
+  </div>
+
+  <!-- modal for adding event -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="card">
+      <h4 style="margin:0 0 8px 0">Add Event</h4>
+      <label for="evtDate">Date</label>
+      <input id="evtDate" type="date" />
+      <label for="evtTitle">Title</label>
+      <input id="evtTitle" type="text" placeholder="Event title" />
+      <label for="evtNote">Note</label>
+      <textarea id="evtNote" rows="3" placeholder="Optional note"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+        <button id="cancelBtn" class="icon" style="color:var(--muted);">Cancel</button>
+        <button id="saveBtn" class="add-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple floating calendar widget with localStorage events
+    const widget = document.getElementById('widget');
+    const calGrid = document.getElementById('calGrid');
+    const monthLabel = document.getElementById('monthLabel');
+    const dayLabel = document.getElementById('dayLabel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const addEventBtn = document.getElementById('addEventBtn');
+    const eventsList = document.getElementById('eventsList');
+
+    const modal = document.getElementById('modal');
+    const evtDate = document.getElementById('evtDate');
+    const evtTitle = document.getElementById('evtTitle');
+    const evtNote = document.getElementById('evtNote');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const minBtn = document.getElementById('minBtn');
+
+    let view = new Date();
+    let selectedDate = null;
+
+    // draggable
+    (function makeDraggable(el) {
+      let isDown = false, startX, startY, startRight, startBottom;
+      el.addEventListener('mousedown', (e) => {
+        // only start drag when clicking header area
+        if (!e.target.closest('.header')) return;
+        isDown = true; startX = e.clientX; startY = e.clientY;
+        const rect = el.getBoundingClientRect(); startRight = window.innerWidth - rect.right; startBottom = window.innerHeight - rect.bottom;
+        document.body.style.userSelect = 'none';
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const dx = e.clientX - startX; const dy = e.clientY - startY;
+        el.style.right = (startRight - dx) + 'px';
+        el.style.bottom = (startBottom - dy) + 'px';
+      });
+      window.addEventListener('mouseup', () => { isDown = false; document.body.style.userSelect = 'auto'; });
+    })(widget);
+
+    // calendar utils
+    function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+    function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0); }
+
+    function render() {
+      calGrid.innerHTML = '';
+      const start = startOfMonth(view);
+      const end = endOfMonth(view);
+      const startWeekday = start.getDay(); // 0 = Sun
+      const daysInMonth = end.getDate();
+
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      weekdays.forEach(w => { const el = document.createElement('div'); el.className = 'weekday'; el.textContent = w; calGrid.appendChild(el); });
+
+      // fill blanks for previous month
+      const prevMonthLastDate = new Date(view.getFullYear(), view.getMonth(), 0).getDate();
+      for (let i = 0; i < startWeekday; i++) {
+        const d = prevMonthLastDate - (startWeekday - 1) + i;
+        const el = document.createElement('div'); el.className = 'day other-month'; el.textContent = d; calGrid.appendChild(el);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const el = document.createElement('div'); el.className = 'day'; el.textContent = d;
+        const cur = new Date(view.getFullYear(), view.getMonth(), d);
+        // today highlight
+        const today = new Date(); if (cur.toDateString() === today.toDateString()) el.classList.add('today');
+        // selected date
+        if (selectedDate && cur.toDateString() === selectedDate.toDateString()) el.classList.add('selected');
+        el.addEventListener('click', () => { selectedDate = cur; updateDayLabel(); renderEventsForDate(cur); render(); });
+
+        // small event indicator
+        const key = dateKey(cur);
+        const evts = loadEvents();
+        if (evts[key] && evts[key].length) {
+          const dot = document.createElement('div'); dot.style.width = '6px'; dot.style.height = '6px'; dot.style.borderRadius = '50%'; dot.style.background = 'var(--accent)'; dot.style.position = 'absolute'; dot.style.marginTop = '28px'; el.style.position = 'relative'; el.appendChild(dot);
+        }
+
+        calGrid.appendChild(el);
+      }
+
+      monthLabel.textContent = view.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+      updateDayLabel();
+    }
+
+    function updateDayLabel() {
+      if (selectedDate) {
+        dayLabel.textContent = selectedDate.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+      } else {
+        const now = new Date(); dayLabel.textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+      }
+    }
+
+    function dateKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+    // events storage
+    function loadEvents() {
+      try { return JSON.parse(localStorage.getItem('widget_events') || '{}'); } catch (e) { return {}; }
+    }
+    function saveEvents(obj) { localStorage.setItem('widget_events', JSON.stringify(obj)); }
+
+    function renderEventsForDate(d) {
+      const key = dateKey(d);
+      const evts = loadEvents();
+      const list = evts[key] || [];
+      eventsList.innerHTML = '';
+      if (list.length === 0) { eventsList.innerHTML = '<div style="padding:12px;color:var(--muted)">No events for this date</div>'; return; }
+      list.forEach((it, idx) => {
+        const el = document.createElement('div'); el.className = 'event';
+        const left = document.createElement('div'); left.innerHTML = '<div style="font-weight:600">' + escapeHtml(it.title) + '</div><div style="font-size:12px;color:var(--muted)">' + escapeHtml(it.note) + '</div>';
+        const right = document.createElement('div'); right.innerHTML = '<div class="meta">' + it.time + '</div><button class="delete" aria-label="Delete" data-idx="' + idx + '">✖</button>';
+        el.appendChild(left); el.appendChild(right);
+        eventsList.appendChild(el);
+        el.querySelector('.delete').addEventListener('click', () => { deleteEvent(key, idx); renderEventsForDate(d); render(); });
+      });
+    }
+
+    function deleteEvent(key, idx) { const evts = loadEvents(); if (!evts[key]) return; evts[key].splice(idx, 1); if (evts[key].length === 0) delete evts[key]; saveEvents(evts); }
+
+    // add event flow
+    addEventBtn.addEventListener('click', () => {
+      modal.classList.add('show');
+      if (selectedDate) evtDate.value = dateKey(selectedDate); else evtDate.value = dateKey(new Date());
+      evtTitle.value = ''; evtNote.value = '';
+    });
+
+    cancelBtn.addEventListener('click', () => { modal.classList.remove('show'); });
+
+    saveBtn.addEventListener('click', () => {
+      const date = evtDate.value; const title = evtTitle.value.trim(); const note = evtNote.value.trim();
+      if (!date || !title) { alert('Please add date and title'); return; }
+      const key = date;
+      const evts = loadEvents(); if (!evts[key]) evts[key] = [];
+      evts[key].push({ title, note, time: new Date().toLocaleTimeString() });
+      saveEvents(evts);
+      modal.classList.remove('show');
+      // refresh
+      if (selectedDate && dateKey(selectedDate) === key) renderEventsForDate(selectedDate);
+      render();
+    });
+
+    prevBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render(); });
+    nextBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render(); });
+
+    // minimize toggle
+    minBtn.addEventListener('click', () => { widget.classList.toggle('minimized'); });
+
+    // escape to close modal
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('show'); });
+
+    // helper
+    function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+    // initialize
+    (function init() {
+      render();
+      renderEventsForDate(new Date());
+    })();
+
+  </script>
+</body>
+
+</html>

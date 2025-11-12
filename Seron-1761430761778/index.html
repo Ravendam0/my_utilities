@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gameweek Poster Reminder Calendar</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-700 min-h-screen flex flex-col items-center justify-center text-white">
+    <main class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl shadow-xl p-8 max-w-md w-full text-center">
+        <h1 class="text-3xl font-extrabold mb-6 flex items-center justify-center gap-3">
+            <i class="fa-solid fa-calendar-days text-yellow-400"></i> Gameweek Poster Reminder Calendar
+        </h1>
+        <p class="mb-6 text-lg">Generate an ICS calendar file with reminders before each gameweek from 10 to 38 to make team posters.</p>
+        <button id="generateBtn" class="bg-yellow-400 text-indigo-900 font-semibold px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-500 transition">
+            <i class="fa-solid fa-download mr-2"></i> Download ICS File
+        </button>
+    </main>
+
+    <a href="https://seron.dev" target="_blank" rel="noopener noreferrer" class="fixed bottom-4 right-4 bg-yellow-400 text-indigo-900 px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:bg-yellow-500 transition">
+        Made by Seron
+    </a>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Country Select with Flag in Input Group</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<body class="p-4">
+  <h4>Country select — With flag images</h4>
+
+  <div class="input-group mb-3 mt-3" style="max-width:420px;">
+    <span class="input-group-text" id="basic-addon1">
+      <!-- flag image will show here -->
+      <img id="selectedFlag" class="flag-img" src="" alt="flag" style="width:30px; height:auto;" />
+    </span>
+    <select id="countrySelect" class="form-select"></select>
+  </div>
+
+  <script src="main.js"></script>
+
+  <script>
+    NextGen.populateSelect("countrySelect");
+    NextGen.attachFlagPreview("countrySelect", "selectedFlag");
+  </script>
+</body>
+
+</html>
