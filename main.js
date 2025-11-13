@@ -343,6 +343,7 @@ function protectPage() {
 
 protectPage();
 
+
 ///To show today,s date
   function displayCurrentDate() {
         const now = new Date();
@@ -351,3 +352,39 @@ protectPage();
 
     // Call the function when the page loads
     window.onload = displayCurrentDate;
+
+
+
+
+
+    // 🧠 Reusable active time tracker
+//     example on how to use it 
+//     <div id="timeActive"></div>
+
+// <script src="https://script.royaltech254.co.ke/main.js"></script>
+// <script>
+//   // Platform-specific start time
+//   startActiveTimer('2025-10-26T00:00:00+03:00', 'timeActive');
+// </script>
+function startActiveTimer(startDateTime, elementId) {
+  const startTime = new Date(startDateTime).getTime();
+
+  function updateTimer() {
+    const now = new Date().getTime();
+    const diff = now - startTime;
+
+    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.innerText = `${years} yrs : ${days} days : ${hours} hrs : ${minutes} min : ${seconds} sec`;
+    }
+  }
+
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}
