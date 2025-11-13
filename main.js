@@ -374,17 +374,19 @@ function startActiveTimer(startDateTime, elementId) {
     const diff = now - startTime;
 
     const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24));
+    const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30.44)); // Avg month length
+    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
     const el = document.getElementById(elementId);
     if (el) {
-      el.innerText = `${years} yrs : ${days} days : ${hours} hrs : ${minutes} min : ${seconds} sec`;
+      el.innerText = `${years} yrs : ${months} mo : ${days} d : ${hours} h : ${minutes} m : ${seconds} s`;
     }
   }
 
   updateTimer();
   setInterval(updateTimer, 1000);
 }
+
