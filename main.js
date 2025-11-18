@@ -308,7 +308,7 @@ function protectPage() {
     // Disable right click
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
-        showToast("ðŸš« Right clicking is disabled by Admin!");
+        showToast(" Right clicking is disabled by Admin!");
     });
 
     // Disable certain key combinations
@@ -316,27 +316,27 @@ function protectPage() {
         // F12
         if (e.key === "F12") {
             e.preventDefault();
-            showToast("ðŸš« Developer tools disabled by Admin!");
+            showToast(" Developer tools disabled by Admin!");
         }
         // Ctrl+Shift+I or Ctrl+Shift+J
         if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) {
             e.preventDefault();
-            showToast("ðŸš« Developer tools disabled by Admin!");
+            showToast(" Developer tools disabled by Admin!");
         }
         // Ctrl+U
         if (e.ctrlKey && e.key.toLowerCase() === "u") {
             e.preventDefault();
-            showToast("ðŸš« View Source disabled by Admin!");
+            showToast(" View Source disabled by Admin!");
         }
         // Ctrl+S
         if (e.ctrlKey && e.key.toLowerCase() === "s") {
             e.preventDefault();
-            showToast("ðŸš« Saving this page is disabled by Admin!");
+            showToast(" Saving this page is disabled by Admin!");
         }
         // Ctrl+C, Ctrl+V, Ctrl+X
         if (e.ctrlKey && ["c", "v", "x"].includes(e.key.toLowerCase())) {
             e.preventDefault();
-            showToast("ðŸš« Copy/Paste disabled by Admin!");
+            showToast(" Copy/Paste disabled by Admin!");
         }
     });
 }
@@ -345,19 +345,19 @@ protectPage();
 
 
 ///To show today,s date
-  function displayCurrentDate() {
-        const now = new Date();
-        document.getElementById("todaysDate").textContent = now.toString();
-    }
+function displayCurrentDate() {
+    const now = new Date();
+    document.getElementById("todaysDate").textContent = now.toString();
+}
 
-    // Call the function when the page loads
-    window.onload = displayCurrentDate;
-
-
+// Call the function when the page loads
+window.onload = displayCurrentDate;
 
 
 
-    // 🧠 Reusable active time tracker
+
+
+// 🧠 Reusable active time tracker
 //     example on how to use it 
 //     <div id="timeActive"></div>
 
@@ -367,26 +367,29 @@ protectPage();
 //   startActiveTimer('2025-10-26T00:00:00+03:00', 'timeActive');
 // </script>
 function startActiveTimer(startDateTime, elementId) {
-  const startTime = new Date(startDateTime).getTime();
+    const startTime = new Date(startDateTime).getTime();
 
-  function updateTimer() {
-    const now = new Date().getTime();
-    const diff = now - startTime;
+    function updateTimer() {
+        const now = new Date().getTime();
+        const diff = now - startTime;
 
-    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30.44)); // Avg month length
-    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+        const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30.44)); // Avg month length
+        const totalDays = Math.floor((diff % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
+        const weeks = Math.floor(totalDays / 7);
+        const days = totalDays % 7;
 
-    const el = document.getElementById(elementId);
-    if (el) {
-      el.innerText = `${years} yrs : ${months} mo : ${days} d : ${hours} h : ${minutes} m : ${seconds} s`;
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.innerText = `${years} yrs : ${months} mo : ${weeks} w : ${days} d : ${hours} h : ${minutes} m : ${seconds} s`;
+        }
     }
-  }
 
-  updateTimer();
-  setInterval(updateTimer, 1000);
+    updateTimer();
+    setInterval(updateTimer, 1000);
 }
 
