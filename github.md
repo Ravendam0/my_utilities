@@ -44,3 +44,18 @@ git stash save "Work on login feature, switching to hotfix"
 # Or the short form:
 
 git stash
+
+
+
+git remote remove origin
+<!-- or -->
+git remote rm origin
+<!-- ✔️ This folder will no longer be linked to that GitHub repo.
+✔️ You can then link it to a new repo. -->
+
+To link a new repo later:
+
+csharp
+Copy code
+git remote add origin https://github.com/Ravendam0/my_utilities.git
+git push -u origin main
