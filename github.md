@@ -59,3 +59,15 @@ csharp
 Copy code
 git remote add origin https://github.com/Ravendam0/my_utilities.git
 git push -u origin main
+
+
+
+<!-- if i want to update every folder differently -->
+
+cd /path/to/task1
+git init
+git add .
+git commit -m "Initial commit for Task 1"
+git branch -M main
+git remote add origin https://github.com/yourusername/task1.git
+git push -u origin main
